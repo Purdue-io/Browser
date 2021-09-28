@@ -1,9 +1,14 @@
 import { Page } from "../src/ts/Pages/Page";
 import { PageFactory, Router, RouterNavigationContext } from "../src/ts/Router";
 
-class MockRootPage extends Page { }
-class MockLevelOnePage extends Page { }
-class MockLevelTwoPage extends Page { }
+class MockPage extends Page {
+    constructor(urlSegment: string) {
+        super("", urlSegment);
+    }
+}
+class MockRootPage extends MockPage { }
+class MockLevelOnePage extends MockPage { }
+class MockLevelTwoPage extends MockPage { }
 
 // Disable console.warn, as we expect this to fire for some of our failure case tests.
 beforeEach(() => {

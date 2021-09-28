@@ -1,14 +1,14 @@
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
-import { PageFactory, Router } from "./Router";
+import { PageFactory, Router, RouterNavigationContext } from "./Router";
 
 export class Application {
-    private rootElement: HTMLElement;
-    private router: Router;
+    private readonly rootElement: HTMLElement;
+    private readonly router: Router;
+    private navigationContext: RouterNavigationContext;
 
     public static start(rootElement: HTMLElement): Application {
         let returnVal = new Application(rootElement);
-        returnVal.initialize();
         return returnVal;
     }
 
@@ -17,9 +17,15 @@ export class Application {
             (pathSegment) => new LandingPage(pathSegment);
         this.rootElement = rootElement;
         this.router = Router.create(rootPageFactory, []);
+        this.navigationContext = this.router.navigate(document.location.pathname);
+        this.presentNavigationContext();
     }
 
-    private initialize(): void {
-        this.router.navigate(document.location.pathname);
+    private presentNavigationContext(): void {
+        while (this.rootElement.firstChild)
+        {
+            this.rootElement.removeChild(this.rootElement.lastChild as Node);
+        }
+        this.rootElement.appendChild(this.navigationContext.currentNode.page.content);
     }
 }
