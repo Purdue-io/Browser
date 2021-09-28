@@ -6,8 +6,7 @@ export class Application {
     private rootElement: HTMLElement;
     private router: Router;
 
-    public static start(rootElement: HTMLElement): Application
-    {
+    public static start(rootElement: HTMLElement): Application {
         let returnVal = new Application(rootElement);
         returnVal.initialize();
         return returnVal;
@@ -15,7 +14,7 @@ export class Application {
 
     private constructor(rootElement: HTMLElement) {
         let rootPageFactory: PageFactory = 
-            (pathSegment) => LandingPage.create(pathSegment);
+            (pathSegment) => new LandingPage(pathSegment);
         this.rootElement = rootElement;
         this.router = Router.create(rootPageFactory, []);
     }
