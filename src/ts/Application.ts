@@ -1,6 +1,6 @@
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
-import { Router } from "./Router";
+import { PageFactory, Router } from "./Router";
 
 export class Application {
     private rootElement: HTMLElement;
@@ -14,11 +14,10 @@ export class Application {
     }
 
     private constructor(rootElement: HTMLElement) {
-        let pageFactories: ((pathSegment: string) => Page)[] = [
-            (pathSegment) => LandingPage.create(pathSegment) // //app/
-        ];
+        let rootPageFactory: PageFactory = 
+            (pathSegment) => LandingPage.create(pathSegment);
         this.rootElement = rootElement;
-        this.router = Router.create(pageFactories);
+        this.router = Router.create(rootPageFactory, []);
     }
 
     private initialize(): void {

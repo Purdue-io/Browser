@@ -1,41 +1,46 @@
 import { Page } from './Pages/Page';
 
+export type PageFactory = (pathSegment: string) => Page;
+
+export interface RouterNavigationNode {
+    segment: string;
+    page: Page;
+}
+
 export interface RouterNavigationContext {
-    pathSegments: string[];
-    pages: Page[];
-    currentPage: Page;
+    nodes: RouterNavigationNode[];
+    currentNode: RouterNavigationNode;
 }
 
 export class Router {
     /**
      * The page list determines which page will handle each URL segment.
      * ex. https://purdue.io/TERMCODE/SUBJECTCODE/CLASSNUMBER
-     *                     | |        |           ^ Page 3
-     *                     | |        ^ Page 2
-     *                     | ^ Page 1
-     *                     ^ Page 0
+     *                     | |        |           ^ Segment page 2
+     *                     | |        ^ Segment page 1
+     *                     | ^ Segment page 0
+     *                     ^ Root page
      */
-    private pageFactories: ((pathSegment: string) => Page)[];
+    private rootPageFactory: PageFactory;
+    private urlSegmentPageFactories: PageFactory[];
 
-    public static create(pageFactories: ((pathSegment: string) => Page)[]): Router {
-        let returnVal = new Router(pageFactories);
+    public static create(rootPageFactory: PageFactory,
+        urlSegmentPageFactories: PageFactory[]): Router {
+        let returnVal = new Router(rootPageFactory, urlSegmentPageFactories);
         return returnVal;
     }
 
-    private constructor(pageFactories: ((pathSegment: string) => Page)[]) {
-        if (pageFactories.length <= 0) {
-            throw new Error("Must provide at least one page factory to Router.");
-        }
-        this.pageFactories = pageFactories;
+    private constructor(rootPageFactory: PageFactory, urlSegmentPageFactories: PageFactory[]) {
+        this.rootPageFactory = rootPageFactory;
+        this.urlSegmentPageFactories = urlSegmentPageFactories;
     }
 
     public navigate(path: string): RouterNavigationContext {
         let pathSegments = this.parsePathSegments(path);
-        let pages = this.pathSegmentsToPages(pathSegments);
+        let nodes = this.pathSegmentsToNavigationNodes(pathSegments);
         return {
-            pathSegments: pathSegments,
-            pages: pages,
-            currentPage: pages.at(pages.length - 1) as Page
+            nodes: nodes,
+            currentNode: nodes[nodes.length - 1]
         };
     }
 
@@ -65,24 +70,22 @@ export class Router {
         return path;
     }
 
-    private pathSegmentsToPages(pathSegments: string[]): Page[]
+    private pathSegmentsToNavigationNodes(pathSegments: string[]): RouterNavigationNode[]
     {
-        // The first page factory is reserved for the root page,
-        // so we begin processing path segments at page factory index 1
-        let pages: Page[] = [];
-        pages.push(this.pageFactories[0](""));
-        if (pathSegments.length > (this.pageFactories.length - 1))
+        let nodes: RouterNavigationNode[] = [];
+        nodes.push({segment: "", page: this.rootPageFactory("")});
+        if (pathSegments.length > this.urlSegmentPageFactories.length)
         {
-            console.warn(`Could not process ${ pathSegments.length } path segments: ` + 
-                `Router is only configured to handle ${ this.pageFactories.length - 1 }. ` + 
+            console.warn(`Could not process ${ pathSegments.length } URL path segments, ` + 
+                `Router is only configured to handle ${ this.urlSegmentPageFactories.length }. ` + 
                 `Falling back to root page.`);
-            return pages;
+            return nodes;
         }
         for(let i = 0; i < pathSegments.length; ++i)
         {
-            let page = this.pageFactories[i + 1](pathSegments[i]);
-            pages.push(page);
+            let page = this.urlSegmentPageFactories[i](pathSegments[i]);
+            nodes.push({segment: pathSegments[i], page: page});
         }
-        return pages;
+        return nodes;
     }
 }
