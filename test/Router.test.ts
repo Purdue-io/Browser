@@ -1,14 +1,33 @@
 import { Page } from "../src/ts/Pages/Page";
-import { PageFactory, Router, RouterNavigationContext } from "../src/ts/Router";
+import { Router, SegmentPageFactory } from "../src/ts/Router";
 
-class MockPage extends Page {
-    constructor(urlSegment: string) {
-        super("", urlSegment);
+class MockRootPage extends Page
+{
+    constructor()
+    {
+        super("");
     }
 }
-class MockRootPage extends MockPage { }
-class MockLevelOnePage extends MockPage { }
-class MockLevelTwoPage extends MockPage { }
+class MockLevelOnePage extends Page
+{
+    public oneValue: string;
+    constructor(oneValue: string)
+    {
+        super("");
+        this.oneValue = oneValue;
+    }
+}
+class MockLevelTwoPage extends Page
+{
+    public oneValue: string;
+    public twoValue: string;
+    constructor(oneValue: string, twoValue: string)
+    {
+        super("");
+        this.oneValue = oneValue;
+        this.twoValue = twoValue;
+    }
+}
 
 // Disable console.warn, as we expect this to fire for some of our failure case tests.
 beforeEach(() => {
@@ -16,72 +35,65 @@ beforeEach(() => {
 });
 
 describe("Router navigation", () => {
-    let rootPageFactory: PageFactory = (segment) => new MockRootPage(segment);
-    let segmentPageFactories: PageFactory[] = [
-        (segment) => new MockLevelOnePage(segment),
-        (segment) => new MockLevelTwoPage(segment),
+    let currentPage: Page | null = null;
+    let segmentPageFactories: SegmentPageFactory[] =
+    [
+        {
+            pageFactory: (pageContext) => new MockRootPage(),
+            segmentName: "root",
+        },
+        {
+            pageFactory: (pageContext) => new MockLevelOnePage(pageContext.segment.segmentValue),
+            segmentName: "one",
+        },
+        {
+            pageFactory: (pageContext) => new MockLevelTwoPage(
+                pageContext.parentPages[0].segment.segmentValue, pageContext.segment.segmentValue),
+            segmentName: "two",
+        },
     ];
-    let router = Router.create(rootPageFactory, segmentPageFactories);
+    let router = new Router(segmentPageFactories, (page) => { currentPage = page; });
 
-    it("should return root page when navigating to ''", () => {
-        let navigationContext = router.navigate("");
-        expect(navigationContext.nodes.length).toEqual(1);
-        expect(navigationContext.nodes[0].page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.nodes[0].segment).toEqual("");
-        expect(navigationContext.currentNode.page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.currentNode.segment).toEqual("");
+    it("should show root page when navigating to ''", () => {
+        router.navigatePath("");
+        expect(currentPage).toBeDefined();
+        expect(currentPage instanceof MockRootPage).toBe(true);
     });
 
-    it("should return root page when navigating to '/'", () => {
-        let navigationContext = router.navigate("/");
-        expect(navigationContext.nodes.length).toEqual(1);
-        expect(navigationContext.nodes[0].page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.nodes[0].segment).toEqual("");
-        expect(navigationContext.currentNode.page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.currentNode.segment).toEqual("");
+    it("should show root page when navigating to '/'", () => {
+        router.navigatePath("/");
+        expect(currentPage).toBeDefined();
+        expect(currentPage instanceof MockRootPage).toBe(true);
     });
 
-    it("should return expected pages when navigating to '/first'", () => {
-        let navigationContext = router.navigate("/first");
-        expect(navigationContext.nodes.length).toEqual(2);
-        expect(navigationContext.nodes[0].page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.nodes[0].segment).toEqual("");
-        expect(navigationContext.nodes[1].page instanceof MockLevelOnePage).toBe(true);
-        expect(navigationContext.nodes[1].segment).toEqual("first");
-        expect(navigationContext.currentNode.page instanceof MockLevelOnePage).toBe(true);
-        expect(navigationContext.currentNode.segment).toEqual("first");
+    it("should show mock level one page when navigating to '/first'", () => {
+        router.navigatePath("/first");
+        expect(currentPage).toBeDefined();
+        expect(currentPage instanceof MockLevelOnePage).toBe(true);
+        let currentMockPage = currentPage as MockLevelOnePage;
+        expect(currentMockPage.oneValue).toEqual("first");
     });
 
-    it("should return expected pages when navigating to '/first/'", () => {
-        let navigationContext = router.navigate("/first/");
-        expect(navigationContext.nodes.length).toEqual(2);
-        expect(navigationContext.nodes[0].page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.nodes[0].segment).toEqual("");
-        expect(navigationContext.nodes[1].page instanceof MockLevelOnePage).toBe(true);
-        expect(navigationContext.nodes[1].segment).toEqual("first");
-        expect(navigationContext.currentNode.page instanceof MockLevelOnePage).toBe(true);
-        expect(navigationContext.currentNode.segment).toEqual("first");
+    it("should show mock level one page when navigating to '/first/'", () => {
+        router.navigatePath("/first/");
+        expect(currentPage).toBeDefined();
+        expect(currentPage instanceof MockLevelOnePage).toBe(true);
+        let currentMockPage = currentPage as MockLevelOnePage;
+        expect(currentMockPage.oneValue).toEqual("first");
     });
 
-    it("should return expected pages when navigating to '/first/second'", () => {
-        let navigationContext = router.navigate("/first/second");
-        expect(navigationContext.nodes.length).toEqual(3);
-        expect(navigationContext.nodes[0].page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.nodes[0].segment).toEqual("");
-        expect(navigationContext.nodes[1].page instanceof MockLevelOnePage).toBe(true);
-        expect(navigationContext.nodes[1].segment).toEqual("first");
-        expect(navigationContext.nodes[2].page instanceof MockLevelTwoPage).toBe(true);
-        expect(navigationContext.nodes[2].segment).toEqual("second");
-        expect(navigationContext.currentNode.page instanceof MockLevelTwoPage).toBe(true);
-        expect(navigationContext.currentNode.segment).toEqual("second");
+    it("should show mock level two page when navigating to '/first/second'", () => {
+        router.navigatePath("/first/second");
+        expect(currentPage).toBeDefined();
+        expect(currentPage instanceof MockLevelTwoPage).toBe(true);
+        let currentMockPage = currentPage as MockLevelTwoPage;
+        expect(currentMockPage.oneValue).toEqual("first");
+        expect(currentMockPage.twoValue).toEqual("second");
     });
 
     it("should return root page only when navigating to invalid path", () => {
-        let navigationContext = router.navigate("/this/path/is/bogus");
-        expect(navigationContext.nodes.length).toEqual(1);
-        expect(navigationContext.nodes[0].page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.nodes[0].segment).toEqual("");
-        expect(navigationContext.currentNode.page instanceof MockRootPage).toBe(true);
-        expect(navigationContext.currentNode.segment).toEqual("");
+        router.navigatePath("/this/path/bogus");
+        expect(currentPage).toBeDefined();
+        expect(currentPage instanceof MockRootPage).toBe(true);
     })
 });

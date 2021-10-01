@@ -1,91 +1,206 @@
+/**
+ * ROUTER
+ * ---
+ * The router handles navigating between Pages via the browser URL or via page navigations
+ * triggered by user actions such as clicking on a link.
+ * 
+ * It operates on a hierarchy made up of "segments". Each portion of a URL delimited by
+ * a forward slash is considered a segment, and each segment has a name and a Page associated
+ * with it.
+ * 
+ * Ex. https://purdue.io/202210/CS/24000/{GUID}/12345
+ *             |         |      |  |     |      ^ "CRN" segment
+ *             |         |      |  |     ^ "Class ID" segment
+ *             |         |      |  ^ "Course Number" segment
+ *             |         |      ^ "Subject Abbreviation" segment
+ *             |         ^ "Term ID" segment
+ *             ^ Root segment
+ * 
+ * Each segment is associated with a Page via a list of segment names and Page factories
+ * passed to the Router when it is created.
+ * 
+ * When a navigation occurs, the segment list is processed and Page instances are created.
+ * Each page receives a copy of its segment name and segment value plus the segment names and
+ * values of each parent page.
+ */
+
 import { Page } from './Pages/Page';
 
-export type PageFactory = (pathSegment: string) => Page;
+export interface Segment
+{
+    segmentName: string;
+    segmentValue: string;
+}
 
-export interface RouterNavigationNode {
-    segment: string;
+export interface SegmentPage
+{
     page: Page;
+    segment: Segment;
 }
 
-export interface RouterNavigationContext {
-    nodes: RouterNavigationNode[];
-    currentNode: RouterNavigationNode;
+export interface PageContext
+{
+    segment: Segment;
+    parentPages: SegmentPage[];
 }
 
-export class Router {
-    /**
-     * The page list determines which page will handle each URL segment.
-     * ex. https://purdue.io/TERMCODE/SUBJECTCODE/CLASSNUMBER
-     *                     | |        |           ^ Segment page 2
-     *                     | |        ^ Segment page 1
-     *                     | ^ Segment page 0
-     *                     ^ Root page
-     */
-    private rootPageFactory: PageFactory;
-    private urlSegmentPageFactories: PageFactory[];
+export type PageFactory = (pageContext: PageContext) => Page;
 
-    public static create(rootPageFactory: PageFactory,
-        urlSegmentPageFactories: PageFactory[]): Router {
-        let returnVal = new Router(rootPageFactory, urlSegmentPageFactories);
-        return returnVal;
+export interface SegmentPageFactory
+{
+    segmentName: string;
+    pageFactory: PageFactory;
+}
+
+export type ShowPageCallback = (page: Page) => void;
+
+export class Router
+{
+    private pageFactories: SegmentPageFactory[];
+    private showPageCallback: ShowPageCallback;
+    private pageStack: SegmentPage[];
+
+    public constructor(urlSegmentPageFactories: SegmentPageFactory[],
+        showPageCallback: ShowPageCallback)
+    {
+        this.pageFactories = urlSegmentPageFactories;
+        this.showPageCallback = showPageCallback;
+        this.pageStack = [];
     }
 
-    private constructor(rootPageFactory: PageFactory, urlSegmentPageFactories: PageFactory[]) {
-        this.rootPageFactory = rootPageFactory;
-        this.urlSegmentPageFactories = urlSegmentPageFactories;
-    }
-
-    public navigate(path: string): RouterNavigationContext {
+    public navigatePath(path: string): void
+    {
         let pathSegments = this.parsePathSegments(path);
-        let nodes = this.pathSegmentsToNavigationNodes(pathSegments);
-        return {
-            nodes: nodes,
-            currentNode: nodes[nodes.length - 1]
-        };
+        // If we have an invalid number of path segments, default to an empty path
+        if (pathSegments.length > this.pageFactories.length)
+        {
+            pathSegments = [""];
+        }
+        this.updatePageStack(pathSegments);
+        let currentPage = this.pageStack[this.pageStack.length - 1].page;
+        this.showPageCallback(currentPage);
     }
 
-    private parsePathSegments(path: string): string[] {
+    private parsePathSegments(path: string): string[]
+    {
         if ((path.length <= 0) || 
             (path.length == 1 && path.charAt(0) == '/'))
         {
-            return [];
+            return [""];
         }
         path = this.stripLeadingAndTrailingSlashes(path);
-        return path.split('/');
+        let segments = path.split('/');
+        // Always include a root segment
+        return [""].concat(segments);
     }
 
-    private stripLeadingAndTrailingSlashes(path: string): string {
-        if (path.length <= 0)
-        {
-            return path;
-        }
-        if (path.charAt(0) == '/')
+    private stripLeadingAndTrailingSlashes(path: string): string
+    {
+        while ((path.length > 0) && (path.charAt(0) == '/'))
         {
             path = path.substring(1);
         }
-        if ((path.length > 0) && path.charAt(path.length - 1) == '/')
+        while ((path.length > 0) && (path.charAt(path.length - 1) == '/'))
         {
             path = path.substring(0, path.length - 1);
         }
         return path;
     }
 
-    private pathSegmentsToNavigationNodes(pathSegments: string[]): RouterNavigationNode[]
+    private updatePageStack(pathSegments: string[]): void
     {
-        let nodes: RouterNavigationNode[] = [];
-        nodes.push({segment: "", page: this.rootPageFactory("")});
-        if (pathSegments.length > this.urlSegmentPageFactories.length)
+        for (let i = 0; i < pathSegments.length; ++i)
+        {
+            let pathSegment = pathSegments[i];
+            if (i < this.pageStack.length)
+            {
+                this.keepOrReplacePageStackEntry(i, pathSegment);
+            }
+            else
+            {
+                this.pushNewPageStackEntry(pathSegment);
+            }
+        }
+
+        // If the path is smaller than the stack, shorten the stack to match
+        if (this.pageStack.length > pathSegments.length)
+        {
+            this.pageStack.splice(pathSegments.length,
+                (this.pageStack.length - pathSegments.length));
+        }
+    }
+
+    private keepOrReplacePageStackEntry(entryIndex: number, newSegmentValue: string): void
+    {
+        let pageStackEntry = this.pageStack[entryIndex];
+        if (entryIndex == 0)
+        {
+            // The root page never needs to be updated
+            // because its segment value is always empty
+            return;
+        }
+
+        if (pageStackEntry.segment === null)
+        {
+            throw new Error("Non-root pages must have a segment defined.");
+        }
+        let pageFactory = this.pageFactories[entryIndex];
+        let stackSegment: Segment = pageStackEntry.segment;
+        if ((stackSegment.segmentName === pageFactory.segmentName) &&
+            (stackSegment.segmentValue === newSegmentValue))
+        {
+            // If the segment names and values haven't changed,
+            // then no update is needed.
+            return;
+        }
+
+        let newPageStackEntry = this.newPageStackEntry(entryIndex, newSegmentValue);
+        this.pageStack[entryIndex] = newPageStackEntry;
+    }
+
+    private pushNewPageStackEntry(pathSegment: string): void
+    {
+        let newPageStackEntry = this.newPageStackEntry(this.pageStack.length, pathSegment);
+        this.pageStack.push(newPageStackEntry);
+    }
+
+    private newPageStackEntry(segmentIndex: number, segmentValue: string): SegmentPage
+    {
+        let pageFactory = this.pageFactories[segmentIndex];
+        let segment: Segment =
+        {
+            segmentName: pageFactory.segmentName,
+            segmentValue: segmentValue,
+        };
+        let pageContext: PageContext = 
+        {
+            parentPages: this.pageStack.slice(0, segmentIndex).reverse(),
+            segment: segment,
+        };
+        let newPage = pageFactory.pageFactory(pageContext);
+        let newPageStackEntry: SegmentPage = 
+        {
+            page: newPage,
+            segment: segment,
+        };
+        return newPageStackEntry;
+    }
+
+    private getSegmentPageFactories(pathSegments: string[]): SegmentPageFactory[]
+    {
+        let factories: SegmentPageFactory[] = [];
+        if (pathSegments.length > this.pageFactories.length)
         {
             console.warn(`Could not process ${ pathSegments.length } URL path segments, ` + 
-                `Router is only configured to handle ${ this.urlSegmentPageFactories.length }. ` + 
+                `Router is only configured to handle ${ this.pageFactories.length }. ` + 
                 `Falling back to root page.`);
-            return nodes;
+            return factories;
         }
         for(let i = 0; i < pathSegments.length; ++i)
         {
-            let page = this.urlSegmentPageFactories[i](pathSegments[i]);
-            nodes.push({segment: pathSegments[i], page: page});
+            let pageFactory = this.pageFactories[i];
+            factories.push(pageFactory);
         }
-        return nodes;
+        return factories;
     }
 }

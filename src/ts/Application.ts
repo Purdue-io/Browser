@@ -1,31 +1,52 @@
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
-import { PageFactory, Router, RouterNavigationContext } from "./Router";
+import { SubjectPage } from "./Pages/SubjectPage";
+import { TermPage } from "./Pages/TermPage";
+import { PageFactory, Router } from "./Router";
 
-export class Application {
-    private readonly rootElement: HTMLElement;
+export class Application
+{
     private readonly router: Router;
-    private navigationContext: RouterNavigationContext;
+    private readonly pageElement: HTMLElement;
 
-    public static start(rootElement: HTMLElement): Application {
-        let returnVal = new Application(rootElement);
+    public static run(): Application
+    {
+        let returnVal = new Application();
+        returnVal.start();
         return returnVal;
     }
 
-    private constructor(rootElement: HTMLElement) {
-        let rootPageFactory: PageFactory = 
-            (pathSegment) => new LandingPage(pathSegment);
-        this.rootElement = rootElement;
-        this.router = Router.create(rootPageFactory, []);
-        this.navigationContext = this.router.navigate(document.location.pathname);
-        this.presentNavigationContext();
+    public start(): void
+    {
+        this.router.navigatePath(document.location.pathname);
     }
 
-    private presentNavigationContext(): void {
-        while (this.rootElement.firstChild)
+    private constructor()
+    {
+        this.router = new Router([
+            {
+                pageFactory: (context) => new LandingPage(),
+                segmentName: "root",
+            },
+            {
+                pageFactory: (context) => new TermPage(context.segment.segmentValue),
+                segmentName: "term",
+            },
+            {
+                pageFactory: (context) => new SubjectPage(
+                    context.parentPages[0].segment.segmentValue, context.segment.segmentValue),
+                segmentName: "subject",
+            },
+        ], this.showPage.bind(this));
+        this.pageElement = document.body.querySelector("main") as HTMLElement;
+    }
+
+    private showPage(page: Page): void
+    {
+        while (this.pageElement.firstChild)
         {
-            this.rootElement.removeChild(this.rootElement.lastChild as Node);
+            this.pageElement.removeChild(this.pageElement.lastChild as Node);
         }
-        this.rootElement.appendChild(this.navigationContext.currentNode.page.content);
+        this.pageElement.appendChild(page.content);
     }
 }

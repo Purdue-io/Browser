@@ -1,0 +1,106 @@
+@font-face {
+    font-family: 'Inter';
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: oblique 0deg 10deg;
+    src: url("Inter.var.woff2?v=3.19") format("woff2");
+}
+
+:root {
+    --background-rgb: 8, 8, 8;
+    --foreground-rgb: 255, 255, 255;
+    --background-color: rgb(var(--background-rgb));
+    --foreground-color: rgb(var(--foreground-rgb));
+    --accent-hue: 42;
+    --accent-color: hsl(var(--accent-hue), 100%, 60%);
+    --default-font: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-big: 32px;
+    --font-size-normal: 16px;
+    --transition-time-fast: 150ms;
+}
+
+/* LIGHT THEME */
+@media (prefers-color-scheme: light) {
+    :root {
+        --background-rgb: 255, 255, 255;
+        --foreground-rgb: 8, 8, 8;
+        --accent-color: hsl(var(--accent-hue), 100%, 35%);
+    }
+}
+
+/* DARK THEME (default) */
+@media (prefers-color-scheme: dark), (prefers-color-scheme:no-preference) {
+    :root {
+        --background-rgb: 8, 8, 8;
+        --foreground-rgb: 255, 255, 255;
+        --accent-color: hsl(var(--accent-hue), 100%, 60%);
+    }
+}
+
+body {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--default-font);
+    font-size: var(--font-size-normal);
+    color: var(--foreground-color);
+    background-color: var(--background-color);
+}
+
+a {
+    color: var(--accent-color);
+    transition: color var(--transition-time-fast) ease-in-out;
+    text-decoration: none;
+}
+
+header {
+    display: flex;
+    align-items: center;
+}
+
+    header > svg {
+        width: 96px;
+        height: 96px;
+    }
+
+    header > nav {
+        margin-left: 8px;
+    }
+
+        header > nav > ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+        }
+
+            header > nav > ul > li {
+                font-size: var(--font-size-big);
+                font-weight: 700;
+                color: rgba(var(--foreground-rgb), 0.5);
+                transition: color var(--transition-time-fast) ease-in-out;
+                cursor: pointer;
+            }
+
+                header > nav > ul > li:not(:last-child)::after {
+                    content: "›";
+                    padding: 0 16px;
+                    color: rgba(var(--foreground-rgb), 0.5);
+                }
+
+                header > nav > ul > li:last-child {
+                    color: rgba(var(--foreground-rgb), 1);
+                }
+
+                header > nav > ul > li:hover {
+                    color: rgba(var(--foreground-rgb), 1);
+                }
+
+main {
+    margin: 0 8px;
+}
