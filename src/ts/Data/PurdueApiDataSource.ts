@@ -1,5 +1,5 @@
 import { IDataSource } from "./IDataSource";
-import { Subject, Term } from "./Models";
+import { Course, Subject, Term } from "./Models";
 
 export class PurdueApiDataSource implements IDataSource
 {
@@ -41,5 +41,23 @@ export class PurdueApiDataSource implements IDataSource
             throw new Error(`Invalid response received when fetching Subjects`);
         }
         return data.value as Subject[];
+    }
+
+    async getCoursesAsync(termCode: string, subjectAbbreviation: string): Promise<Course[]>
+    {
+        let response = await fetch(`${this.odataRootUri}/Course?$filter=` +
+            `(Classes/any(c: c/Term/Code eq '${termCode}')) and ` +
+            `Subject/Abbreviation eq '${subjectAbbreviation}'`);
+        if (!response.ok)
+        {
+            throw new Error(`Received error response when fetching Courses: ` + 
+                `${response.status}: ${response.statusText}`);
+        }
+        let data = await response.json();
+        if (!('value' in data))
+        {
+            throw new Error(`Invalid response received when fetching Courses`);
+        }
+        return data.value as Course[];
     }
 }

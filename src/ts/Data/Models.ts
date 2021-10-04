@@ -13,3 +13,12 @@ export interface Subject
     Name: string;
     Abbreviation: string;
 }
+
+export interface Course
+{
+    Id: string;
+    Number: string;
+    Title: string;
+    CreditHours: number;
+    Description: number;
+}

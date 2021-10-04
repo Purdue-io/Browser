@@ -191,3 +191,49 @@ div.page.TermPage ul.subjects {
             div.page.TermPage ul.subjects > li.subject a:hover div.name {
                 color: rgba(var(--foreground-rgb), 1);
             }
+
+/* Subject Page */
+div.page.SubjectPage ul.courses {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+    div.page.SubjectPage ul.courses > li.level {
+        flex-basis: 100%;
+        font-size: var(--font-size-big);
+        font-weight: 700;
+        padding: 8px 0;
+    }
+
+    div.page.SubjectPage ul.courses > li.course {
+        padding: 0;
+        overflow: hidden;
+    }
+        div.page.SubjectPage ul.courses > li.course a {
+            display: block;
+            width: 130px;
+            height: 108px;
+            margin: 4px;
+        }
+
+            div.page.SubjectPage ul.courses > li.course a div.number {
+                font-size: var(--font-size-big);
+            }
+
+            div.page.SubjectPage ul.courses > li.course a:hover div.number::after {
+                content: "›";
+                padding: 0 8px;
+            }
+
+            div.page.SubjectPage ul.courses > li.course a div.title {
+                font-size: var(--font-size-normal);
+                color: rgba(var(--foreground-rgb), 0.7);
+                transition: color var(--transition-time-fast) ease-in-out;
+            }
+            div.page.SubjectPage ul.courses > li.course a:hover div.title {
+                color: rgba(var(--foreground-rgb), 1);
+            }

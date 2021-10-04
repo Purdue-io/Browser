@@ -48,7 +48,7 @@ export class Application
                 segmentName: "term",
             },
             {
-                pageFactory: (context) => new SubjectPage(this.pageLink.bind(this),
+                pageFactory: (context) => new SubjectPage(this.dataSource, this.pageLink.bind(this),
                     context.parentPages[0].segment.segmentValue, context.segment.segmentValue),
                 segmentName: "subject",
             },
