@@ -1,3 +1,4 @@
+import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
 import { LandingPage } from "./Pages/LandingPage";
@@ -6,13 +7,15 @@ import { SubjectPage } from "./Pages/SubjectPage";
 import { TermPage } from "./Pages/TermPage";
 import { PageFactory, Router, SegmentPage } from "./Router";
 
-export type NavigateCallback = (originPage: Page, nextSegment: string) => void;
+export type LinkCallback = (originPage: Page, nextSegment: string) => void;
+export type NavigateCallback = (absolutePath: string) => void;
 
 export class Application
 {
     private readonly dataSource: IDataSource;
     private readonly router: Router;
     private readonly pageElement: HTMLElement;
+    private readonly breadcrumbs: Breadcrumbs;
 
     public static run(): Application
     {
@@ -36,21 +39,23 @@ export class Application
         this.router = new Router([
             {
                 pageFactory: (context) => new LandingPage(this.dataSource,
-                    this.pageNavigate.bind(this)),
+                    this.pageLink.bind(this)),
                 segmentName: "root",
             },
             {
-                pageFactory: (context) => new TermPage(this.pageNavigate.bind(this),
-                    context.segment.segmentValue),
+                pageFactory: (context) => new TermPage(this.dataSource,
+                    this.pageLink.bind(this), context.segment.segmentValue),
                 segmentName: "term",
             },
             {
-                pageFactory: (context) => new SubjectPage(this.pageNavigate.bind(this),
+                pageFactory: (context) => new SubjectPage(this.pageLink.bind(this),
                     context.parentPages[0].segment.segmentValue, context.segment.segmentValue),
                 segmentName: "subject",
             },
         ], this.pageStackUpdated.bind(this));
         this.pageElement = document.body.querySelector("main") as HTMLElement;
+        let breadcrumbsListElement = document.body.querySelector("nav ul") as HTMLUListElement;
+        this.breadcrumbs = new Breadcrumbs(breadcrumbsListElement, this.navigate.bind(this));
     }
 
     private pageStackUpdated(pageStack: SegmentPage[]): void
@@ -60,13 +65,21 @@ export class Application
         this.pageElement.replaceChildren();
         newContentPromise.then((content) => {
             this.pageElement.appendChild(content);
-        })
+        });
+        this.breadcrumbs.updateBreadcrumbs(pageStack);
     }
 
-    private pageNavigate(originPage: Page, nextSegment: string): void
+    private pageLink(originPage: Page, nextSegment: string): void
     {
         let absolutePath = this.router.navigateRelativePath(nextSegment);
-        let url = `${window.location.origin}/${absolutePath}`;
+        let url = `${window.location.origin}${absolutePath}`;
+        window.history.pushState(null, "", url);
+    }
+
+    private navigate(absolutePath: string): void
+    {
+        this.router.navigateAbsolutePath(absolutePath);
+        let url = `${window.location.origin}${absolutePath}`;
         window.history.pushState(null, "", url);
     }
 }

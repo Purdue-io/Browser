@@ -83,7 +83,7 @@ export class Router
         pathSegments = pathSegments.concat(newPathSegments);
         this.navigatePathSegments(pathSegments);
         // Skip the root segment when returning the path
-        return pathSegments.slice(1).join("/");
+        return "/" + pathSegments.slice(1).join("/");
     }
 
     private navigatePathSegments(pathSegments: string[]): void

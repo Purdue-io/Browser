@@ -1,4 +1,4 @@
-import { NavigateCallback } from "../Application";
+import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
 import { Page } from "./Page";
 
@@ -6,9 +6,9 @@ export class LandingPage extends Page
 {
     private readonly dataSource: IDataSource;
 
-    constructor(dataSource: IDataSource, navigateCallback: NavigateCallback)
+    constructor(dataSource: IDataSource, linkCallback: LinkCallback)
     {
-        super("LandingPage", navigateCallback);
+        super("LandingPage", linkCallback);
         this.dataSource = dataSource;
     }
 
@@ -54,7 +54,7 @@ export class LandingPage extends Page
             termLink.textContent = term.Name;
             termLink.addEventListener("click", (e) => {
                 e.preventDefault();
-                this.navigateCallback(this, term.Code)
+                this.linkCallback(this, term.Code);
             });
             termListItem.appendChild(termLink);
             termListElement.appendChild(termListItem);

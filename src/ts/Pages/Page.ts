@@ -1,15 +1,15 @@
-import { NavigateCallback } from "../Application";
+import { LinkCallback } from "../Application";
 
 export class Page
 {
     protected readonly templateId: string;
-    protected readonly navigateCallback: NavigateCallback;
+    protected readonly linkCallback: LinkCallback;
     protected readonly _content: HTMLElement;
 
-    protected constructor(templateId: string, navigateCallback: NavigateCallback)
+    protected constructor(templateId: string, linkCallback: LinkCallback)
     {
         this.templateId = templateId;
-        this.navigateCallback = navigateCallback;
+        this.linkCallback = linkCallback;
         if (templateId === "") {
             // For tests to run with mock pages
             this._content = document.createElement("div");
@@ -21,6 +21,11 @@ export class Page
     public async showAsync(): Promise<HTMLElement>
     {
         return this._content;
+    }
+
+    public async getTitleAsync(): Promise<string>
+    {
+        return "Purdue.io";
     }
 
     private loadTemplate(templateId: string): HTMLElement

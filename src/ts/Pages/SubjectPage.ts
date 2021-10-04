@@ -1,4 +1,4 @@
-import { NavigateCallback } from "../Application";
+import { LinkCallback } from "../Application";
 import { Page } from "./Page";
 
 export class SubjectPage extends Page
@@ -6,11 +6,16 @@ export class SubjectPage extends Page
     private termCode: string;
     private subjectCode: string;
 
-    constructor(navigateCallback: NavigateCallback, termCode: string, subjectCode: string)
+    constructor(linkCallback: LinkCallback, termCode: string, subjectCode: string)
     {
-        super("SubjectPage", navigateCallback);
+        super("SubjectPage", linkCallback);
         this.termCode = termCode;
         this.subjectCode = subjectCode;
         console.log(`${termCode}: ${subjectCode}`);
+    }
+
+    public override async getTitleAsync(): Promise<string>
+    {
+        return this.subjectCode;
     }
 }
