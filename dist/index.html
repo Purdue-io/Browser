@@ -19,26 +19,55 @@
                 viewBox="0 0 512 512">
                 <path
                     style="fill:var(--accent-color);fill-opacity:1;stroke:none"
-                    d="M 157.8125 169.8125 L 140.03125 211.6875 L 181.28125 211.6875 L 144.0625 299.8125 L 102.1875 299.8125 L 84.46875 342.03125 L 251.875 342.03125 L 270.03125 299.8125 L 228.09375 299.8125 L 236.09375 280.875 L 342.3125 280.5625 C 358.07842 280.51444 394.78055 276.30814 413.125 240.9375 C 417.90082 231.72905 421.78532 222.05025 425.09375 212.21875 C 430.28627 196.7884 427.33476 183.79381 416.53125 177.59375 C 407.82213 172.59564 396.28223 169.9435 386.375 169.9375 L 157.8125 169.8125 z M 265.40625 211.59375 L 337.40625 211.59375 C 337.40625 211.59375 346.30108 211.98937 347.4375 216.15625 C 347.65108 216.93936 347.51525 218.29869 347.40625 219.90625 C 346.88898 227.53316 336.14388 238.49228 324.625 238.5 L 254.03125 238.5625 L 265.40625 211.59375 z "/>
+                    d="M 157.8125 169.8125 L 140.03125 211.6875 L 181.28125 211.6875
+                       L 144.0625 299.8125 L 102.1875 299.8125 L 84.46875 342.03125
+                       L 251.875 342.03125 L 270.03125 299.8125 L 228.09375 299.8125
+                       L 236.09375 280.875 L 342.3125 280.5625
+                       C 358.07842 280.51444 394.78055 276.30814 413.125 240.9375
+                       C 417.90082 231.72905 421.78532 222.05025 425.09375 212.21875
+                       C 430.28627 196.7884 427.33476 183.79381 416.53125 177.59375
+                       C 407.82213 172.59564 396.28223 169.9435 386.375 169.9375
+                       L 157.8125 169.8125 z M 265.40625 211.59375 L 337.40625 211.59375
+                       C 337.40625 211.59375 346.30108 211.98937 347.4375 216.15625
+                       C 347.65108 216.93936 347.51525 218.29869 347.40625 219.90625
+                       C 346.88898 227.53316 336.14388 238.49228 324.625 238.5
+                       L 254.03125 238.5625 L 265.40625 211.59375 z "/>
             </svg>
             <nav>
                 <ul>
                     <li>Purdue.io</li>
-                    <li>Fall 2021</li>
-                    <li>CS</li>
                 </ul>
             </nav>
         </header>
         <main></main>
         <!-- Page templates -->
         <template id="LandingPageTemplate">
-            <h1>Hello world</h1>
-            <p>I'm the landing page!</p>
+            <section>
+                <h1>Welcome to Purdue.io</h1>
+                <p>Purdue.io is an open API for accessing Purdue University course catalog data.</p>
+                <p>Select a term to browse course data.</p>
+                <p>
+                    Learn
+                    <a href="https://github.com/Purdue-io/PurdueApi/wiki/OData-Queries"
+                        target="_blank">
+                        how to use the API
+                    </a>
+                    or contribute to its development
+                    <a href="https://github.com/Purdue-io/PurdueApi" target="_blank">
+                        on GitHub.
+                    </a>
+                </p>
+            </section>
+            <section>
+                <h1>Terms</h1>
+                <ul class="terms"></ul>
+            </section>
         </template>
 
         <template id="TermPageTemplate">
-            <h1>Hello again</h1>
-            <p>I'm the term page!</p>
+            <section>
+
+            </section>
         </template>
 
         <template id="SubjectPageTemplate">

@@ -5,7 +5,7 @@ class MockRootPage extends Page
 {
     constructor()
     {
-        super("");
+        super("", () => {});
     }
 }
 class MockLevelOnePage extends Page
@@ -13,7 +13,7 @@ class MockLevelOnePage extends Page
     public oneValue: string;
     constructor(oneValue: string)
     {
-        super("");
+        super("", () => {});
         this.oneValue = oneValue;
     }
 }
@@ -23,7 +23,7 @@ class MockLevelTwoPage extends Page
     public twoValue: string;
     constructor(oneValue: string, twoValue: string)
     {
-        super("");
+        super("", () => {});
         this.oneValue = oneValue;
         this.twoValue = twoValue;
     }
@@ -55,19 +55,19 @@ describe("Router navigation", () => {
     let router = new Router(segmentPageFactories, (page) => { currentPage = page; });
 
     it("should show root page when navigating to ''", () => {
-        router.navigatePath("");
+        router.navigateAbsolutePath("");
         expect(currentPage).toBeDefined();
         expect(currentPage instanceof MockRootPage).toBe(true);
     });
 
     it("should show root page when navigating to '/'", () => {
-        router.navigatePath("/");
+        router.navigateAbsolutePath("/");
         expect(currentPage).toBeDefined();
         expect(currentPage instanceof MockRootPage).toBe(true);
     });
 
     it("should show mock level one page when navigating to '/first'", () => {
-        router.navigatePath("/first");
+        router.navigateAbsolutePath("/first");
         expect(currentPage).toBeDefined();
         expect(currentPage instanceof MockLevelOnePage).toBe(true);
         let currentMockPage = currentPage as MockLevelOnePage;
@@ -75,7 +75,7 @@ describe("Router navigation", () => {
     });
 
     it("should show mock level one page when navigating to '/first/'", () => {
-        router.navigatePath("/first/");
+        router.navigateAbsolutePath("/first/");
         expect(currentPage).toBeDefined();
         expect(currentPage instanceof MockLevelOnePage).toBe(true);
         let currentMockPage = currentPage as MockLevelOnePage;
@@ -83,7 +83,7 @@ describe("Router navigation", () => {
     });
 
     it("should show mock level two page when navigating to '/first/second'", () => {
-        router.navigatePath("/first/second");
+        router.navigateAbsolutePath("/first/second");
         expect(currentPage).toBeDefined();
         expect(currentPage instanceof MockLevelTwoPage).toBe(true);
         let currentMockPage = currentPage as MockLevelTwoPage;
@@ -92,7 +92,7 @@ describe("Router navigation", () => {
     });
 
     it("should return root page only when navigating to invalid path", () => {
-        router.navigatePath("/this/path/bogus");
+        router.navigateAbsolutePath("/this/path/bogus");
         expect(currentPage).toBeDefined();
         expect(currentPage instanceof MockRootPage).toBe(true);
     })

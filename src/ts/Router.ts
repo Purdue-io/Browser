@@ -52,46 +52,65 @@ export interface SegmentPageFactory
     pageFactory: PageFactory;
 }
 
-export type ShowPageCallback = (page: Page) => void;
+export type PageStackUpdatedCallback = (pageStack: SegmentPage[]) => void;
 
 export class Router
 {
     private pageFactories: SegmentPageFactory[];
-    private showPageCallback: ShowPageCallback;
+    private pageStackUpdatedCallback: PageStackUpdatedCallback;
     private pageStack: SegmentPage[];
 
     public constructor(urlSegmentPageFactories: SegmentPageFactory[],
-        showPageCallback: ShowPageCallback)
+        pageStackUpdatedCallback: PageStackUpdatedCallback)
     {
         this.pageFactories = urlSegmentPageFactories;
-        this.showPageCallback = showPageCallback;
+        this.pageStackUpdatedCallback = pageStackUpdatedCallback;
         this.pageStack = [];
     }
 
-    public navigatePath(path: string): void
+    public navigateAbsolutePath(path: string): void
     {
-        let pathSegments = this.parsePathSegments(path);
+        let newPathSegments = this.parsePathSegments(path);
+        // Always include a root segment
+        newPathSegments = [""].concat(newPathSegments);
+        this.navigatePathSegments(newPathSegments);
+    }
+
+    public navigateRelativePath(path: string): string
+    {
+        let pathSegments = this.pageStack.map(p => p.segment.segmentValue);
+        let newPathSegments = this.parsePathSegments(path);
+        pathSegments = pathSegments.concat(newPathSegments);
+        this.navigatePathSegments(pathSegments);
+        // Skip the root segment when returning the path
+        return pathSegments.slice(1).join("/");
+    }
+
+    private navigatePathSegments(pathSegments: string[]): void
+    {
         // If we have an invalid number of path segments, default to an empty path
         if (pathSegments.length > this.pageFactories.length)
         {
             pathSegments = [""];
         }
         this.updatePageStack(pathSegments);
-        let currentPage = this.pageStack[this.pageStack.length - 1].page;
-        this.showPageCallback(currentPage);
+        let pageStackClone: SegmentPage[] = this.pageStack.map((v): SegmentPage => ({
+            page: v.page,
+            segment: v.segment,
+        }));
+        this.pageStackUpdatedCallback(pageStackClone);
     }
 
     private parsePathSegments(path: string): string[]
     {
-        if ((path.length <= 0) || 
+        if ((path.length <= 0) ||
             (path.length == 1 && path.charAt(0) == '/'))
         {
-            return [""];
+            return [];
         }
         path = this.stripLeadingAndTrailingSlashes(path);
         let segments = path.split('/');
-        // Always include a root segment
-        return [""].concat(segments);
+        return segments;
     }
 
     private stripLeadingAndTrailingSlashes(path: string): string

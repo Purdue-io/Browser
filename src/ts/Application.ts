@@ -1,52 +1,72 @@
+import { IDataSource } from "./Data/IDataSource";
+import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
 import { SubjectPage } from "./Pages/SubjectPage";
 import { TermPage } from "./Pages/TermPage";
-import { PageFactory, Router } from "./Router";
+import { PageFactory, Router, SegmentPage } from "./Router";
+
+export type NavigateCallback = (originPage: Page, nextSegment: string) => void;
 
 export class Application
 {
+    private readonly dataSource: IDataSource;
     private readonly router: Router;
     private readonly pageElement: HTMLElement;
 
     public static run(): Application
     {
-        let returnVal = new Application();
+        let dataSource = new PurdueApiDataSource("https://new-api.purdue.io/odata");
+        let returnVal = new Application(dataSource);
         returnVal.start();
         return returnVal;
     }
 
     public start(): void
     {
-        this.router.navigatePath(document.location.pathname);
+        window.addEventListener("popstate", (e) => {
+            this.router.navigateAbsolutePath(document.location.pathname);
+        });
+        this.router.navigateAbsolutePath(document.location.pathname);
     }
 
-    private constructor()
+    private constructor(dataSource: IDataSource)
     {
+        this.dataSource = dataSource;
         this.router = new Router([
             {
-                pageFactory: (context) => new LandingPage(),
+                pageFactory: (context) => new LandingPage(this.dataSource,
+                    this.pageNavigate.bind(this)),
                 segmentName: "root",
             },
             {
-                pageFactory: (context) => new TermPage(context.segment.segmentValue),
+                pageFactory: (context) => new TermPage(this.pageNavigate.bind(this),
+                    context.segment.segmentValue),
                 segmentName: "term",
             },
             {
-                pageFactory: (context) => new SubjectPage(
+                pageFactory: (context) => new SubjectPage(this.pageNavigate.bind(this),
                     context.parentPages[0].segment.segmentValue, context.segment.segmentValue),
                 segmentName: "subject",
             },
-        ], this.showPage.bind(this));
+        ], this.pageStackUpdated.bind(this));
         this.pageElement = document.body.querySelector("main") as HTMLElement;
     }
 
-    private showPage(page: Page): void
+    private pageStackUpdated(pageStack: SegmentPage[]): void
     {
-        while (this.pageElement.firstChild)
-        {
-            this.pageElement.removeChild(this.pageElement.lastChild as Node);
-        }
-        this.pageElement.appendChild(page.content);
+        let currentPageSegment = pageStack[pageStack.length - 1];
+        let newContentPromise = currentPageSegment.page.showAsync();
+        this.pageElement.replaceChildren();
+        newContentPromise.then((content) => {
+            this.pageElement.appendChild(content);
+        })
+    }
+
+    private pageNavigate(originPage: Page, nextSegment: string): void
+    {
+        let absolutePath = this.router.navigateRelativePath(nextSegment);
+        let url = `${window.location.origin}/${absolutePath}`;
+        window.history.pushState(null, "", url);
     }
 }

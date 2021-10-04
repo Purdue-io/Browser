@@ -14,7 +14,8 @@
     --accent-hue: 42;
     --accent-color: hsl(var(--accent-hue), 100%, 60%);
     --default-font: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    --font-size-big: 32px;
+    --font-size-huge: 32px;
+    --font-size-big: 24px;
     --font-size-normal: 16px;
     --transition-time-fast: 150ms;
 }
@@ -80,7 +81,7 @@ header {
         }
 
             header > nav > ul > li {
-                font-size: var(--font-size-big);
+                font-size: var(--font-size-huge);
                 font-weight: 700;
                 color: rgba(var(--foreground-rgb), 0.5);
                 transition: color var(--transition-time-fast) ease-in-out;
@@ -102,5 +103,39 @@ header {
                 }
 
 main {
-    margin: 0 8px;
+    margin: 0;
 }
+
+h1 {
+    font-size: var(--font-size-big);
+}
+
+div.page {
+    display: flex;
+    flex-direction: row;
+}
+
+    div.page > section {
+        margin: 0 16px;
+    }
+
+/* Landing Page */
+div.page.LandingPage ul.terms {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+    div.page.LandingPage ul.terms > li > a {
+        display: block;
+        padding: 4px 0;
+        font-size: var(--font-size-normal);
+        font-weight: 700;
+    }
+    div.page.LandingPage ul.terms > li:first-child > a {
+        padding: 0 0 16px 0;
+        font-size: var(--font-size-big);
+    }
+    div.page.LandingPage ul.terms > li > a:hover::after {
+        content: "›";
+        padding: 0 8px;
+    }
