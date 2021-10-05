@@ -25,7 +25,7 @@ export class Page
 
     public async getTitleAsync(): Promise<string>
     {
-        return "Purdue.io";
+        return "PAGE";
     }
 
     private loadTemplate(templateId: string): HTMLElement

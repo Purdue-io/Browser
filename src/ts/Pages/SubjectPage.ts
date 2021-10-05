@@ -34,9 +34,8 @@ export class SubjectPage extends Page
         let courseListElement = this._content.querySelector("ul.courses");
         if (courseListElement === null)
         {
-            console.error("Could not update subject list, " +
+            throw new Error("Could not update subject list, " +
                 "element 'ul.courses' could not be found");
-            return;
         }
 
         let courses = await this.dataSource.getCoursesAsync(this.termCode, this.subjectCode);
@@ -63,6 +62,10 @@ export class SubjectPage extends Page
             courseListItem.classList.add("course");
             let courseLink = document.createElement("a");
             courseLink.href = `/${this.termCode}/${this.subjectCode}/${course.Id}`;
+            courseLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                this.linkCallback(this, course.Id);
+            });
             let courseNum = document.createElement("div");
             courseNum.classList.add("number");
             courseNum.innerText = course.Number;

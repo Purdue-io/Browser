@@ -18,6 +18,11 @@ export class LandingPage extends Page
         return this._content;
     }
 
+    public override async getTitleAsync(): Promise<string>
+    {
+        return "Purdue.io";
+    }
+
     private async updateTermsAsync(): Promise<void>
     {
         let termListElement = this._content.querySelector("ul.terms");

@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
+import { CoursePage } from "./Pages/CoursePage";
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
 import { SubjectPage } from "./Pages/SubjectPage";
@@ -51,6 +52,11 @@ export class Application
                 pageFactory: (context) => new SubjectPage(this.dataSource, this.pageLink.bind(this),
                     context.parentPages[0].segment.segmentValue, context.segment.segmentValue),
                 segmentName: "subject",
+            },
+            {
+                pageFactory: (context) => new CoursePage(this.dataSource, this.pageLink.bind(this),
+                    context.parentPages[1].segment.segmentValue, context.segment.segmentValue),
+                segmentName: "course",
             },
         ], this.pageStackUpdated.bind(this));
         this.pageElement = document.body.querySelector("main") as HTMLElement;

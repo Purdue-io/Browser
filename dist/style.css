@@ -213,6 +213,7 @@ div.page.SubjectPage ul.courses {
         padding: 0;
         overflow: hidden;
     }
+
         div.page.SubjectPage ul.courses > li.course a {
             display: block;
             width: 130px;
@@ -237,3 +238,47 @@ div.page.SubjectPage ul.courses {
             div.page.SubjectPage ul.courses > li.course a:hover div.title {
                 color: rgba(var(--foreground-rgb), 1);
             }
+
+/* Course Page */
+div.page.CoursePage ul.classes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+    div.page.CoursePage ul.classes > li {
+        padding: 0;
+        overflow: hidden;
+    }
+
+        div.page.CoursePage ul.classes > li a {
+            display: block;
+            width: 520px;
+            margin: 16px;
+        }
+
+            div.page.CoursePage ul.classes > li a div.title {
+                font-size: var(--font-size-big);
+            }
+
+            div.page.CoursePage ul.classes > li a:hover div.title::after {
+                content: "›";
+                padding: 0 8px;
+            }
+
+            div.page.CoursePage ul.classes > li a table {
+                width: 100%;
+                color: rgba(var(--foreground-rgb), 0.7);
+                transition: color var(--transition-time-fast) ease-in-out;
+            }
+
+            div.page.CoursePage ul.classes > li a:hover table {
+                color: rgba(var(--foreground-rgb), 1);
+            }
+
+                div.page.CoursePage ul.classes > li a table tr td {
+                    padding: 2px 6px;
+                }
