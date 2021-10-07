@@ -4,6 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
+    "publish": "webpack --mode=production",
     "build": "webpack --mode=development",
     "watch": "webpack --watch --mode=development",
     "serve": "serve -s",

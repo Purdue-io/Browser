@@ -1,6 +1,6 @@
 const path = require('path');
 
-module.exports = {
+var config = {
     entry: './src/index.ts',
     devtool: 'inline-source-map',
     module: {
@@ -19,4 +19,11 @@ module.exports = {
         filename: 'index.js',
         path: path.resolve(__dirname, 'dist'),
     }
+};
+
+module.exports = (env, argv) => {
+    if (argv.mode === 'production') {
+        config.devtool = "source-map";
+    }
+    return config;
 };
