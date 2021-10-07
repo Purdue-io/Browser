@@ -26,6 +26,23 @@ export class PurdueApiDataSource implements IDataSource
         return data.value as Term[];
     }
 
+    async getTermNameAsync(termCode: string): Promise<string>
+    {
+        let response = await fetch(`${this.odataRootUri}/Term?` + 
+            `$filter=Code eq '${termCode}'&$select=Name`);
+        if (!response.ok)
+        {
+            throw new Error(`Received error response when fetching Term name: ` + 
+                `${response.status}: ${response.statusText}`);
+        }
+        let data = await response.json();
+        if (!('value' in data))
+        {
+            throw new Error(`Invalid response received when fetching Term name`);
+        }
+        return data.value[0].Name as string;
+    }
+
     async getSubjectsAsync(termCode: string): Promise<Subject[]>
     {
         let response = await fetch(`${this.odataRootUri}/Subject?$filter=` + 
@@ -59,6 +76,23 @@ export class PurdueApiDataSource implements IDataSource
             throw new Error(`Invalid response received when fetching Courses`);
         }
         return data.value as Course[];
+    }
+
+    async getCourseNumberAsync(courseId: string): Promise<string>
+    {
+        let response = await fetch(`${this.odataRootUri}/Course?` + 
+            `$filter=Id eq ${courseId}&$select=Number`);
+        if (!response.ok)
+        {
+            throw new Error(`Received error response when fetching Course number: ` + 
+                `${response.status}: ${response.statusText}`);
+        }
+        let data = await response.json();
+        if (!('value' in data))
+        {
+            throw new Error(`Invalid response received when fetching Course number`);
+        }
+        return data.value[0].Number as string;
     }
 
     async getTermCourseDetailsAsync(termCode: string, courseId: string): Promise<CourseDetails>

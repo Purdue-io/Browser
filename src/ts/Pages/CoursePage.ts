@@ -1,6 +1,7 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
 import { CourseClassDetails, SectionDetails } from "../Data/Models";
+import { PageContext } from "../Router";
 import { Page } from "./Page";
 
 export class CoursePage extends Page
@@ -8,20 +9,45 @@ export class CoursePage extends Page
     private readonly dataSource: IDataSource;
     private termCode: string;
     private courseId: string;
+    private title: string | null;
 
-    constructor(dataSource: IDataSource, linkCallback: LinkCallback, termCode: string,
-        courseId: string)
+    constructor(dataSource: IDataSource, linkCallback: LinkCallback, context: PageContext)
     {
         super("CoursePage", linkCallback);
         this.dataSource = dataSource;
-        this.termCode = termCode;
-        this.courseId = courseId;
+        this.termCode = context.parentPages[1].segment.segmentValue;
+        this.courseId = context.segment.segmentValue;
+        if (context.hints === null)
+        {
+            this.title = null;
+        }
+        else
+        {
+            this.title = context.hints.title;
+        }
     }
 
     public override async showAsync(): Promise<HTMLElement>
     {
         await this.updateCourseDetailsAsync();
         return this._content;
+    }
+
+    public override async getTitleAsync(): Promise<string>
+    {
+        if (this.title !== null)
+        {
+            return this.title;
+        }
+        try
+        {
+            this.title = await this.dataSource.getCourseNumberAsync(this.courseId);
+            return this.title;
+        }
+        catch (error)
+        {
+            return "ERROR";
+        }
     }
 
     private async updateCourseDetailsAsync(): Promise<void>
@@ -59,11 +85,11 @@ export class CoursePage extends Page
     {
         let titleElement = document.createElement("div");
         titleElement.classList.add("title");
-        titleElement.innerText = this.getTitle(groupedSections);
+        titleElement.innerText = this.getClassTitle(groupedSections);
         return titleElement;
     }
 
-    private getTitle(groupedSections: Map<string, SectionDetails[]>): string
+    private getClassTitle(groupedSections: Map<string, SectionDetails[]>): string
     {
         if (groupedSections.has("Lecture"))
         {

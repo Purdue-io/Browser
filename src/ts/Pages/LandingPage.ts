@@ -59,7 +59,7 @@ export class LandingPage extends Page
             termLink.textContent = term.Name;
             termLink.addEventListener("click", (e) => {
                 e.preventDefault();
-                this.linkCallback(this, term.Code);
+                this.linkCallback(this, term.Code, { title: term.Name });
             });
             termListItem.appendChild(termLink);
             termListElement.appendChild(termListItem);

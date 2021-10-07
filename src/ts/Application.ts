@@ -6,9 +6,9 @@ import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
 import { SubjectPage } from "./Pages/SubjectPage";
 import { TermPage } from "./Pages/TermPage";
-import { PageFactory, Router, SegmentPage } from "./Router";
+import { PageFactory, PageHints, Router, SegmentPage } from "./Router";
 
-export type LinkCallback = (originPage: Page, nextSegment: string) => void;
+export type LinkCallback = (originPage: Page, nextSegment: string, hints: PageHints) => void;
 export type NavigateCallback = (absolutePath: string) => void;
 
 export class Application
@@ -29,9 +29,9 @@ export class Application
     public start(): void
     {
         window.addEventListener("popstate", (e) => {
-            this.router.navigateAbsolutePath(document.location.pathname);
+            this.router.navigatePath(document.location.pathname);
         });
-        this.router.navigateAbsolutePath(document.location.pathname);
+        this.router.navigatePath(document.location.pathname);
     }
 
     private constructor(dataSource: IDataSource)
@@ -45,7 +45,7 @@ export class Application
             },
             {
                 pageFactory: (context) => new TermPage(this.dataSource,
-                    this.pageLink.bind(this), context.segment.segmentValue),
+                    this.pageLink.bind(this), context),
                 segmentName: "term",
             },
             {
@@ -55,7 +55,7 @@ export class Application
             },
             {
                 pageFactory: (context) => new CoursePage(this.dataSource, this.pageLink.bind(this),
-                    context.parentPages[1].segment.segmentValue, context.segment.segmentValue),
+                    context),
                 segmentName: "course",
             },
         ], this.pageStackUpdated.bind(this));
@@ -75,16 +75,16 @@ export class Application
         this.breadcrumbs.updateBreadcrumbs(pageStack);
     }
 
-    private pageLink(originPage: Page, nextSegment: string): void
+    private pageLink(originPage: Page, nextSegment: string, hints: PageHints): void
     {
-        let absolutePath = this.router.navigateRelativePath(nextSegment);
+        let absolutePath = this.router.pushSegment(nextSegment, hints);
         let url = `${window.location.origin}${absolutePath}`;
         window.history.pushState(null, "", url);
     }
 
     private navigate(absolutePath: string): void
     {
-        this.router.navigateAbsolutePath(absolutePath);
+        this.router.navigatePath(absolutePath);
         let url = `${window.location.origin}${absolutePath}`;
         window.history.pushState(null, "", url);
     }

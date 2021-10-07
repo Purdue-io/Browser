@@ -1,18 +1,27 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
+import { PageContext } from "../Router";
 import { Page } from "./Page";
 
 export class TermPage extends Page
 {
     private readonly dataSource: IDataSource;
     private termCode: string;
+    private title: string | null;
 
-    constructor(dataSource: IDataSource, linkCallback: LinkCallback, termCode: string)
+    constructor(dataSource: IDataSource, linkCallback: LinkCallback, context: PageContext)
     {
         super("TermPage", linkCallback);
         this.dataSource = dataSource;
-        this.termCode = termCode;
-        console.log(termCode);
+        this.termCode = context.segment.segmentValue;
+        if (context.hints === null)
+        {
+            this.title = null;
+        }
+        else
+        {
+            this.title = context.hints.title;
+        }
     }
 
     public override async showAsync(): Promise<HTMLElement>
@@ -23,7 +32,19 @@ export class TermPage extends Page
 
     public override async getTitleAsync(): Promise<string>
     {
-        return this.termCode;
+        if (this.title !== null)
+        {
+            return this.title;
+        }
+        try
+        {
+            this.title = await this.dataSource.getTermNameAsync(this.termCode);
+            return this.title;
+        }
+        catch (error)
+        {
+            return "ERROR";
+        }
     }
 
     private async updateSubjectsAsync(): Promise<void>
@@ -68,7 +89,8 @@ export class TermPage extends Page
             subjectLink.appendChild(subjectName);
             subjectLink.addEventListener("click", (e) => {
                 e.preventDefault();
-                this.linkCallback(this, subject.Abbreviation);
+                this.linkCallback(this, subject.Abbreviation,
+                    { title: subject.Abbreviation });
             });
             subjectListItem.appendChild(subjectLink);
             subjectListElement.appendChild(subjectListItem);

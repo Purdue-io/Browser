@@ -15,7 +15,6 @@ export class SubjectPage extends Page
         this.dataSource = dataSource;
         this.termCode = termCode;
         this.subjectCode = subjectCode;
-        console.log(`${termCode}: ${subjectCode}`);
     }
 
     public override async showAsync(): Promise<HTMLElement>
@@ -43,8 +42,6 @@ export class SubjectPage extends Page
             return a.Number.localeCompare(b.Number);
         });
 
-        console.log(courses);
-
         courseListElement.replaceChildren();
         let lastLevel = "";
         for (let course of courses)
@@ -64,7 +61,7 @@ export class SubjectPage extends Page
             courseLink.href = `/${this.termCode}/${this.subjectCode}/${course.Id}`;
             courseLink.addEventListener("click", (e) => {
                 e.preventDefault();
-                this.linkCallback(this, course.Id);
+                this.linkCallback(this, course.Id, { title: course.Number });
             });
             let courseNum = document.createElement("div");
             courseNum.classList.add("number");

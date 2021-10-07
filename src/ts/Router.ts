@@ -42,6 +42,12 @@ export interface PageContext
 {
     segment: Segment;
     parentPages: SegmentPage[];
+    hints: PageHints | null;
+}
+
+export interface PageHints
+{
+    title: string | null;
 }
 
 export type PageFactory = (pageContext: PageContext) => Page;
@@ -68,25 +74,37 @@ export class Router
         this.pageStack = [];
     }
 
-    public navigateAbsolutePath(path: string): void
+    public pushSegment(segment: string, hints: PageHints): string
+    {
+        this.pushNewPageStackEntry(segment, hints);
+        this.firePageStackUpdatedCallback();
+        return this.getAbsolutePath();
+    }
+
+    public navigatePath(path: string): void
     {
         let newPathSegments = this.parsePathSegments(path);
         // Always include a root segment
         newPathSegments = [""].concat(newPathSegments);
-        this.navigatePathSegments(newPathSegments);
+        this.setPathSegments(newPathSegments);
     }
 
-    public navigateRelativePath(path: string): string
+    private firePageStackUpdatedCallback(): void
+    {
+        let pageStackClone: SegmentPage[] = this.pageStack.map((v): SegmentPage => ({
+            page: v.page,
+            segment: v.segment,
+        }));
+        this.pageStackUpdatedCallback(pageStackClone);
+    }
+
+    private getAbsolutePath(): string
     {
         let pathSegments = this.pageStack.map(p => p.segment.segmentValue);
-        let newPathSegments = this.parsePathSegments(path);
-        pathSegments = pathSegments.concat(newPathSegments);
-        this.navigatePathSegments(pathSegments);
-        // Skip the root segment when returning the path
         return "/" + pathSegments.slice(1).join("/");
     }
 
-    private navigatePathSegments(pathSegments: string[]): void
+    private setPathSegments(pathSegments: string[]): void
     {
         // If we have an invalid number of path segments, default to an empty path
         if (pathSegments.length > this.pageFactories.length)
@@ -94,11 +112,7 @@ export class Router
             pathSegments = [""];
         }
         this.updatePageStack(pathSegments);
-        let pageStackClone: SegmentPage[] = this.pageStack.map((v): SegmentPage => ({
-            page: v.page,
-            segment: v.segment,
-        }));
-        this.pageStackUpdatedCallback(pageStackClone);
+        this.firePageStackUpdatedCallback();
     }
 
     private parsePathSegments(path: string): string[]
@@ -137,7 +151,7 @@ export class Router
             }
             else
             {
-                this.pushNewPageStackEntry(pathSegment);
+                this.pushNewPageStackEntry(pathSegment, null);
             }
         }
 
@@ -173,17 +187,18 @@ export class Router
             return;
         }
 
-        let newPageStackEntry = this.newPageStackEntry(entryIndex, newSegmentValue);
+        let newPageStackEntry = this.newPageStackEntry(entryIndex, newSegmentValue, null);
         this.pageStack[entryIndex] = newPageStackEntry;
     }
 
-    private pushNewPageStackEntry(pathSegment: string): void
+    private pushNewPageStackEntry(pathSegment: string, hints: PageHints | null): void
     {
-        let newPageStackEntry = this.newPageStackEntry(this.pageStack.length, pathSegment);
+        let newPageStackEntry = this.newPageStackEntry(this.pageStack.length, pathSegment, hints);
         this.pageStack.push(newPageStackEntry);
     }
 
-    private newPageStackEntry(segmentIndex: number, segmentValue: string): SegmentPage
+    private newPageStackEntry(segmentIndex: number, segmentValue: string, hints: PageHints | null):
+        SegmentPage
     {
         let pageFactory = this.pageFactories[segmentIndex];
         let segment: Segment =
@@ -195,6 +210,7 @@ export class Router
         {
             parentPages: this.pageStack.slice(0, segmentIndex).reverse(),
             segment: segment,
+            hints: hints
         };
         let newPage = pageFactory.pageFactory(pageContext);
         let newPageStackEntry: SegmentPage = 

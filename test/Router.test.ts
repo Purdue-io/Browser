@@ -56,19 +56,19 @@ describe("Router navigation", () => {
     let router = new Router(segmentPageFactories, (s) => { pageStack = s; });
 
     it("should show root page when navigating to ''", () => {
-        router.navigateAbsolutePath("");
+        router.navigatePath("");
         expect(pageStack).toBeDefined();
         expect(getLastPage().page instanceof MockRootPage).toBe(true);
     });
 
     it("should show root page when navigating to '/'", () => {
-        router.navigateAbsolutePath("/");
+        router.navigatePath("/");
         expect(pageStack).toBeDefined();
         expect(getLastPage().page instanceof MockRootPage).toBe(true);
     });
 
     it("should show mock level one page when navigating to '/first'", () => {
-        router.navigateAbsolutePath("/first");
+        router.navigatePath("/first");
         expect(pageStack).toBeDefined();
         expect(getLastPage().page instanceof MockLevelOnePage).toBe(true);
         let currentMockPage = getLastPage().page as MockLevelOnePage;
@@ -76,7 +76,7 @@ describe("Router navigation", () => {
     });
 
     it("should show mock level one page when navigating to '/first/'", () => {
-        router.navigateAbsolutePath("/first/");
+        router.navigatePath("/first/");
         expect(pageStack).toBeDefined();
         expect(getLastPage().page instanceof MockLevelOnePage).toBe(true);
         let currentMockPage = getLastPage().page as MockLevelOnePage;
@@ -84,7 +84,7 @@ describe("Router navigation", () => {
     });
 
     it("should show mock level two page when navigating to '/first/second'", () => {
-        router.navigateAbsolutePath("/first/second");
+        router.navigatePath("/first/second");
         expect(pageStack).toBeDefined();
         expect(getLastPage().page instanceof MockLevelTwoPage).toBe(true);
         let currentMockPage = getLastPage().page as MockLevelTwoPage;
@@ -93,7 +93,7 @@ describe("Router navigation", () => {
     });
 
     it("should return root page only when navigating to invalid path", () => {
-        router.navigateAbsolutePath("/this/path/bogus");
+        router.navigatePath("/this/path/bogus");
         expect(pageStack).toBeDefined();
         expect(getLastPage().page instanceof MockRootPage).toBe(true);
     })
