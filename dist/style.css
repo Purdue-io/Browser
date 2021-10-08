@@ -397,7 +397,7 @@ div.page.CoursePage ul.classes {
 @media (max-width: 520px) {
     div.page.CoursePage ul.classes > li a {
         width: 100%;
-        margin: 0;
+        margin: 0 0 16px 0;
     }
         div.page.CoursePage ul.classes > li a table {
             font-size: var(--font-size-small);
