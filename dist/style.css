@@ -34,6 +34,7 @@
 .anim-page-in {
     animation-name: anim-page-in;
     animation-duration: var(--transition-time-medium);
+    animation-timing-function: ease-out;
     /* animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000); */
     animation-iteration-count: 1;
 }
@@ -46,8 +47,15 @@
 .anim-page-out {
     animation-name: anim-page-out;
     animation-duration: var(--transition-time-medium);
+    animation-timing-function: ease-out;
     /* animation-timing-function: cubic-bezier(0.600, 0.040, 0.980, 0.335); */
     animation-iteration-count: 1;
+}
+
+@keyframes anim-loading-spinner {
+    to {
+        transform: rotate(90deg);
+    }
 }
 
 /* Light Theme */
@@ -143,6 +151,29 @@ header {
                 header > nav > ul > li > a:hover {
                     color: rgba(var(--foreground-rgb), 1);
                 }
+
+/* Loading Curtain */
+div.LoadingCurtainTemplate {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    background-color: rgba(var(--background-rgb), 0.5);
+}
+div.spinner {
+    width: 48px;
+    height: 48px;
+    background-color: var(--accent-color);
+    animation-name: anim-loading-spinner;
+    animation-iteration-count: infinite;
+    animation-duration: 1000ms;
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
+}
 
 /* All Pages */
 div.page {

@@ -2,6 +2,7 @@ import { Animator } from "./Animator";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
+import { LoadingCurtain } from "./LoadingCurtain";
 import { CoursePage } from "./Pages/CoursePage";
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
@@ -18,6 +19,7 @@ export class Application
     private readonly router: Router;
     private readonly pageElement: HTMLElement;
     private readonly breadcrumbs: Breadcrumbs;
+    private readonly loadingCurtain: LoadingCurtain;
 
     public static run(): Application
     {
@@ -63,11 +65,13 @@ export class Application
         this.pageElement = document.body.querySelector("main") as HTMLElement;
         let breadcrumbsListElement = document.body.querySelector("nav ul") as HTMLUListElement;
         this.breadcrumbs = new Breadcrumbs(breadcrumbsListElement, this.navigate.bind(this));
+        this.loadingCurtain = new LoadingCurtain();
     }
 
     private pageStackUpdated(pageStack: SegmentPage[]): void
     {
         let newPageSegment = pageStack[pageStack.length - 1];
+        let loadingTicket = this.loadingCurtain.setLoading();
         let newContentPromise = newPageSegment.page.showAsync();
         let pageContainer = this.pageElement.firstElementChild;
         if (pageContainer !== null)
@@ -75,6 +79,7 @@ export class Application
             Animator.RunAnimation(pageContainer as HTMLElement, "anim-page-out").then(() => {
                 this.pageElement.replaceChildren();
                 newContentPromise.then((content) => {
+                    loadingTicket.clear();
                     this.pageElement.appendChild(content);
                     Animator.RunAnimation(content, "anim-page-in");
                 });
@@ -84,6 +89,7 @@ export class Application
         {
             this.pageElement.replaceChildren();
             newContentPromise.then((content) => {
+                loadingTicket.clear();
                 this.pageElement.appendChild(content);
                 Animator.RunAnimation(content, "anim-page-in");
             });

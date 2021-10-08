@@ -10,10 +10,13 @@ export class Page
     {
         this.templateId = templateId;
         this.linkCallback = linkCallback;
-        if (templateId === "") {
+        if (templateId === "")
+        {
             // For tests to run with mock pages
             this._content = document.createElement("div");
-        } else {
+        }
+        else
+        {
             this._content = this.loadTemplate(`${this.templateId}Template`);
         }
     }
@@ -31,7 +34,8 @@ export class Page
     private loadTemplate(templateId: string): HTMLElement
     {
         let templateElement = document.querySelector(`#${templateId}`) as HTMLTemplateElement;
-        if (templateElement === null) {
+        if (templateElement === null)
+        {
             throw new Error(`Cannot find template element with id '${templateId}'`);
         }
         let container = document.createElement("div") as HTMLDivElement;
