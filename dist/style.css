@@ -219,6 +219,7 @@ div.page.LandingPage ul.terms {
     flex-direction: row;
     flex-wrap: wrap;
     list-style-type: none;
+    align-items: baseline;
     margin: 0;
     padding: 0;
 }
