@@ -185,6 +185,7 @@ div.LoadingCurtainTemplate {
     z-index: 999;
     background-color: rgba(var(--background-rgb), 0.5);
 }
+
 div.spinner {
     width: 48px;
     height: 48px;
@@ -214,23 +215,44 @@ div.page {
 
 /* Landing Page */
 div.page.LandingPage ul.terms {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
+
+    div.page.LandingPage section.welcome {
+        min-width: 240px;
+        flex-shrink: 0.2;
+    }
+
     div.page.LandingPage ul.terms > li > a {
         display: block;
+        width: 150px;
         padding: 4px 0;
         font-size: var(--font-size-normal);
         font-weight: 700;
     }
-    div.page.LandingPage ul.terms > li:first-child > a {
-        padding: 0 0 16px 0;
-        font-size: var(--font-size-big);
-    }
+
+        div.page.LandingPage ul.terms > li.primary > a {
+            width: 200px;
+            font-size: var(--font-size-big);
+        }
+
     div.page.LandingPage ul.terms > li > a:hover::after {
         content: "›";
         padding: 0 8px;
+    }
+
+    div.page.LandingPage ul.terms > li.termGroup {
+        flex-basis: 100%;
+        color: rgba(var(--foreground-rgb), 0.7);
+    }
+
+    div.page.LandingPage ul.terms > li.termGroup:not(:first-child) {
+        margin-top: 12px;
     }
 
 /* Term Page */

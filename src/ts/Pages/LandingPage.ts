@@ -51,9 +51,29 @@ export class LandingPage extends Page
         });
 
         termListElement.replaceChildren();
+        let termIndex: number = 0;
+        let currentPrefix: string = ""
         for (let term of terms)
         {
+            if (term.Code.length >= 4)
+            {
+                if (term.Code.substr(0, 4).localeCompare(currentPrefix) !== 0)
+                {
+                    let prefix = term.Code.substr(0, 4);
+                    let termGroupItem = document.createElement("li");
+                    termGroupItem.classList.add("termGroup");
+                    let startYear: number = parseInt(prefix) - 1;
+                    termGroupItem.innerText = `${startYear} - ${startYear + 1}`;
+                    termListElement.appendChild(termGroupItem);
+                    currentPrefix = prefix;
+                }
+            }
             let termListItem = document.createElement("li");
+            termListItem.classList.add("term");
+            if (termIndex === 0)
+            {
+                termListItem.classList.add("primary");
+            }
             let termLink = document.createElement("a");
             termLink.href = term.Code;
             termLink.textContent = term.Name;
@@ -63,6 +83,7 @@ export class LandingPage extends Page
             });
             termListItem.appendChild(termLink);
             termListElement.appendChild(termListItem);
+            ++termIndex;
         }
     }
 }
