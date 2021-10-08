@@ -1,3 +1,4 @@
+/* Fonts */
 @font-face {
     font-family: 'Inter';
     font-weight: 100 900;
@@ -6,6 +7,7 @@
     src: url("Inter.var.woff2?v=3.19") format("woff2");
 }
 
+/* Variables */
 :root {
     --background-rgb: 8, 8, 8;
     --foreground-rgb: 255, 255, 255;
@@ -20,9 +22,35 @@
     --font-size-big: 24px;
     --font-size-normal: 16px;
     --transition-time-fast: 150ms;
+    --transition-time-medium: 250ms;
 }
 
-/* LIGHT THEME */
+/* Animations */
+@keyframes anim-page-in {
+    from {
+        opacity: 0;
+    }
+}
+.anim-page-in {
+    animation-name: anim-page-in;
+    animation-duration: var(--transition-time-medium);
+    /* animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000); */
+    animation-iteration-count: 1;
+}
+
+@keyframes anim-page-out {
+    to {
+        opacity: 0;
+    }
+}
+.anim-page-out {
+    animation-name: anim-page-out;
+    animation-duration: var(--transition-time-medium);
+    /* animation-timing-function: cubic-bezier(0.600, 0.040, 0.980, 0.335); */
+    animation-iteration-count: 1;
+}
+
+/* Light Theme */
 @media (prefers-color-scheme: light) {
     :root {
         --background-rgb: 255, 255, 255;
@@ -32,7 +60,7 @@
     }
 }
 
-/* DARK THEME (default) */
+/* Dark Theme (default) */
 @media (prefers-color-scheme: dark), (prefers-color-scheme:no-preference) {
     :root {
         --background-rgb: 8, 8, 8;
@@ -40,6 +68,7 @@
     }
 }
 
+/* Common Elements */
 body {
     display: flex;
     flex-direction: column;
@@ -56,6 +85,15 @@ a {
     text-decoration: none;
 }
 
+main {
+    margin: 0 8px;
+}
+
+h1 {
+    font-size: var(--font-size-big);
+}
+
+/* Header + Breadcrumbs */
 header {
     position: sticky;
     top: 0;
@@ -64,6 +102,7 @@ header {
     align-items: center;
     align-self: stretch;
     margin: 0 8px;
+    z-index: 100; /* Needed to keep this above animating content for some reason */
 }
 
     header > svg {
@@ -105,14 +144,7 @@ header {
                     color: rgba(var(--foreground-rgb), 1);
                 }
 
-main {
-    margin: 0 8px;
-}
-
-h1 {
-    font-size: var(--font-size-big);
-}
-
+/* All Pages */
 div.page {
     display: flex;
     flex-direction: row;

@@ -1,3 +1,4 @@
+import { Animator } from "./Animator";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
@@ -66,12 +67,27 @@ export class Application
 
     private pageStackUpdated(pageStack: SegmentPage[]): void
     {
-        let currentPageSegment = pageStack[pageStack.length - 1];
-        let newContentPromise = currentPageSegment.page.showAsync();
-        this.pageElement.replaceChildren();
-        newContentPromise.then((content) => {
-            this.pageElement.appendChild(content);
-        });
+        let newPageSegment = pageStack[pageStack.length - 1];
+        let newContentPromise = newPageSegment.page.showAsync();
+        let pageContainer = this.pageElement.firstElementChild;
+        if (pageContainer !== null)
+        {
+            Animator.RunAnimation(pageContainer as HTMLElement, "anim-page-out").then(() => {
+                this.pageElement.replaceChildren();
+                newContentPromise.then((content) => {
+                    this.pageElement.appendChild(content);
+                    Animator.RunAnimation(content, "anim-page-in");
+                });
+            });
+        }
+        else
+        {
+            this.pageElement.replaceChildren();
+            newContentPromise.then((content) => {
+                this.pageElement.appendChild(content);
+                Animator.RunAnimation(content, "anim-page-in");
+            });
+        }
         this.breadcrumbs.updateBreadcrumbs(pageStack);
     }
 
