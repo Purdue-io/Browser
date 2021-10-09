@@ -1,5 +1,6 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
+import { DomHelpers } from "../DomHelpers";
 import { PageContext } from "../Router";
 import { Page } from "./Page";
 
@@ -62,7 +63,7 @@ export class TermPage extends Page
             return a.Abbreviation.localeCompare(b.Abbreviation);
         });
 
-        subjectListElement.replaceChildren();
+        DomHelpers.clearChildren(subjectListElement);
         let lastLetter: string = "";
         for (let subject of subjects)
         {

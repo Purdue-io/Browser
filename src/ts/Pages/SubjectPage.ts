@@ -1,5 +1,6 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
+import { DomHelpers } from "../DomHelpers";
 import { Page } from "./Page";
 
 export class SubjectPage extends Page
@@ -42,7 +43,7 @@ export class SubjectPage extends Page
             return a.Number.localeCompare(b.Number);
         });
 
-        courseListElement.replaceChildren();
+        DomHelpers.clearChildren(courseListElement);
         let lastLevel = "";
         for (let course of courses)
         {

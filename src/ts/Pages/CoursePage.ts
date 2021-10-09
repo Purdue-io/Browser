@@ -1,6 +1,7 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
 import { CourseClassDetails, SectionDetails, Utilities } from "../Data/Models";
+import { DomHelpers } from "../DomHelpers";
 import { PageContext } from "../Router";
 import { Page } from "./Page";
 
@@ -59,7 +60,7 @@ export class CoursePage extends Page
         {
             throw new Error("Could not update class list, element 'ul.classes' could not be found");
         }
-        classListElement.replaceChildren();
+        DomHelpers.clearChildren(classListElement);
 
         let courseDetails = await this.dataSource.getTermCourseDetailsAsync(this.termCode,
             this.courseId);

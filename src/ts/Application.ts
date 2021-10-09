@@ -2,6 +2,7 @@ import { Animator } from "./Animator";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
+import { DomHelpers } from "./DomHelpers";
 import { LoadingCurtain } from "./LoadingCurtain";
 import { ClassPage } from "./Pages/ClassPage";
 import { CoursePage } from "./Pages/CoursePage";
@@ -83,7 +84,7 @@ export class Application
         if (pageContainer !== null)
         {
             Animator.RunAnimation(pageContainer as HTMLElement, "anim-page-out").then(() => {
-                this.pageElement.replaceChildren();
+                DomHelpers.clearChildren(this.pageElement);
                 newContentPromise.then((content) => {
                     loadingTicket.clear();
                     this.pageElement.appendChild(content);
@@ -93,7 +94,7 @@ export class Application
         }
         else
         {
-            this.pageElement.replaceChildren();
+            DomHelpers.clearChildren(this.pageElement);
             newContentPromise.then((content) => {
                 loadingTicket.clear();
                 this.pageElement.appendChild(content);

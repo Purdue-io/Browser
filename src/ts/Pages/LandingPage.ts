@@ -1,5 +1,6 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
+import { DomHelpers } from "../DomHelpers";
 import { Page } from "./Page";
 
 export class LandingPage extends Page
@@ -50,7 +51,7 @@ export class LandingPage extends Page
             return (bGtA - aGtB);
         });
 
-        termListElement.replaceChildren();
+        DomHelpers.clearChildren(termListElement);
         let termIndex: number = 0;
         let currentPrefix: string = ""
         for (let term of terms)

@@ -1,6 +1,7 @@
 import { LinkCallback } from "../Application";
 import { IDataSource } from "../Data/IDataSource";
 import { Instructor, SectionDetails, Utilities } from "../Data/Models";
+import { DomHelpers } from "../DomHelpers";
 import { PageContext } from "../Router";
 import { Page } from "./Page";
 
@@ -58,7 +59,7 @@ export class ClassPage extends Page
             throw new Error("Could not update section list, " + 
                 "element 'ul.sections' could not be found");
         }
-        sectionListElement.replaceChildren();
+        DomHelpers.clearChildren(sectionListElement);
 
         let classDetails = await this.dataSource.getClassDetailsAsync(this.classId);
         let groupedSections = Utilities.getGroupedSections(classDetails.Sections);
