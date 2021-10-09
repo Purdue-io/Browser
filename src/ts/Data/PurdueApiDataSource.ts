@@ -12,7 +12,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getTermsAsync(): Promise<Term[]>
     {
-        let response = await fetch(`${this.odataRootUri}/Term`);
+        let response = await fetch(`${this.odataRootUri}/Terms`);
         if (!response.ok)
         {
             throw new Error(`Received error response when fetching Terms: ` + 
@@ -28,7 +28,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getTermNameAsync(termCode: string): Promise<string>
     {
-        let response = await fetch(`${this.odataRootUri}/Term?` + 
+        let response = await fetch(`${this.odataRootUri}/Terms?` + 
             `$filter=Code eq '${termCode}'&$select=Name`);
         if (!response.ok)
         {
@@ -45,7 +45,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getSubjectsAsync(termCode: string): Promise<Subject[]>
     {
-        let response = await fetch(`${this.odataRootUri}/Subject?$filter=` + 
+        let response = await fetch(`${this.odataRootUri}/Subjects?$filter=` + 
             `(Courses/any(c: c/Classes/any(cc: cc/Term/Code eq '${termCode}')))`);
         if (!response.ok)
         {
@@ -62,7 +62,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getCoursesAsync(termCode: string, subjectAbbreviation: string): Promise<Course[]>
     {
-        let response = await fetch(`${this.odataRootUri}/Course?$filter=` +
+        let response = await fetch(`${this.odataRootUri}/Courses?$filter=` +
             `(Classes/any(c: c/Term/Code eq '${termCode}')) and ` +
             `Subject/Abbreviation eq '${subjectAbbreviation}'`);
         if (!response.ok)
@@ -80,7 +80,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getCourseNumberAsync(courseId: string): Promise<string>
     {
-        let response = await fetch(`${this.odataRootUri}/Course?` + 
+        let response = await fetch(`${this.odataRootUri}/Courses?` + 
             `$filter=Id eq ${courseId}&$select=Number`);
         if (!response.ok)
         {
@@ -97,7 +97,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getTermCourseDetailsAsync(termCode: string, courseId: string): Promise<CourseDetails>
     {
-        let response = await fetch(`${this.odataRootUri}/Course?$filter=` + 
+        let response = await fetch(`${this.odataRootUri}/Courses?$filter=` + 
             `Id eq ${courseId}&$expand=Classes($filter=Term/Code eq '${termCode}';` + 
             `$expand=Sections($expand=Meetings($expand=Instructors,Room($expand=Building))))`);
         if (!response.ok)
@@ -115,7 +115,7 @@ export class PurdueApiDataSource implements IDataSource
 
     async getClassDetailsAsync(classId: string): Promise<CourseClassDetails>
     {
-        let response = await fetch(`${this.odataRootUri}/Class?$filter=` + 
+        let response = await fetch(`${this.odataRootUri}/Classes?$filter=` + 
             `Id eq ${classId}&` + 
             `$expand=Sections($expand=Meetings($expand=Instructors,Room($expand=Building)))`);
         if (!response.ok)
