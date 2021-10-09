@@ -1,5 +1,5 @@
 import { IDataSource } from "./IDataSource";
-import { Course, CourseDetails, Subject, Term } from "./Models";
+import { Course, CourseClassDetails, CourseDetails, Subject, Term } from "./Models";
 
 export class PurdueApiDataSource implements IDataSource
 {
@@ -111,5 +111,23 @@ export class PurdueApiDataSource implements IDataSource
             throw new Error(`Invalid response received when fetching Course details`);
         }
         return data.value[0] as CourseDetails;
+    }
+
+    async getClassDetailsAsync(classId: string): Promise<CourseClassDetails>
+    {
+        let response = await fetch(`${this.odataRootUri}/Class?$filter=` + 
+            `Id eq ${classId}&` + 
+            `$expand=Sections($expand=Meetings($expand=Instructors,Room($expand=Building)))`);
+        if (!response.ok)
+        {
+            throw new Error(`Received error response when fetching Class details: ` + 
+                `${response.status}: ${response.statusText}`);
+        }
+        let data = await response.json();
+        if (!('value' in data) || (data.value.length <= 0))
+        {
+            throw new Error(`Invalid response received when fetching Class details`);
+        }
+        return data.value[0] as CourseClassDetails;
     }
 }

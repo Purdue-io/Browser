@@ -1,4 +1,4 @@
-import { Course, CourseDetails, Subject, Term } from "./Models";
+import { Course, CourseClassDetails, CourseDetails, Subject, Term } from "./Models";
 
 export interface IDataSource
 {
@@ -8,4 +8,5 @@ export interface IDataSource
     getCoursesAsync(termCode: string, subjectAbbreviation: string): Promise<Course[]>;
     getCourseNumberAsync(courseId: string): Promise<string>;
     getTermCourseDetailsAsync(termCode: string, courseId: string): Promise<CourseDetails>;
+    getClassDetailsAsync(classId: string): Promise<CourseClassDetails>;
 }

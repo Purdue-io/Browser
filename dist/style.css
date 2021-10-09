@@ -153,7 +153,7 @@ header {
                     color: rgba(var(--foreground-rgb), 1);
                 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
     header > nav > ul {
         flex-direction: column;
     }
@@ -206,7 +206,7 @@ div.page {
         margin: 0 16px;
     }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
     div.page {
         display: flex;
         flex-direction: column;
@@ -368,7 +368,7 @@ div.page.CoursePage ul.classes {
 
         div.page.CoursePage ul.classes > li a {
             display: block;
-            width: 520px;
+            width: 600px;
             margin: 16px;
         }
 
@@ -395,7 +395,7 @@ div.page.CoursePage ul.classes {
                     padding: 2px 6px;
                 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
     div.page.CoursePage ul.classes > li a {
         width: 100%;
         margin: 0 0 16px 0;
@@ -403,4 +403,66 @@ div.page.CoursePage ul.classes {
         div.page.CoursePage ul.classes > li a table {
             font-size: var(--font-size-small);
         }
+}
+
+/* Class Page */
+div.page.ClassPage ul.sections {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+    div.page.ClassPage ul.sections > li {
+        padding: 0;
+        display: block;
+        width: 400px;
+        margin: 16px;
+    }
+
+        div.page.ClassPage ul.sections > li.sectionType {
+            flex-basis: 100%;
+            font-size: var(--font-size-big);
+            font-weight: 700;
+        }
+
+        div.page.ClassPage ul.sections > li.section {
+            color: rgba(var(--foreground-rgb), 0.7);
+            transition: color var(--transition-time-fast) ease-in-out;
+        }
+
+            div.page.ClassPage ul.sections > li.section > label {
+                font-size: var(--font-size-small);
+                color: rgba(var(--foreground-rgb), 1);
+                font-weight: 500;
+            }
+
+            div.page.ClassPage ul.sections > li.section > * {
+                margin-bottom: 8px;
+            }
+
+            div.page.ClassPage ul.sections > li.section > table {
+                width: 100%;
+                border-spacing: 0;
+                border: none;
+            }
+
+            div.page.ClassPage ul.sections > li.section > div.crn {
+                font-size: var(--font-size-big);
+                color: var(--foreground-color);
+            }
+
+            div.page.ClassPage ul.sections > li.section > ul.instructors {
+                list-style-type: none;
+                margin: 0 0 8px 0;
+                padding: 0;
+            }
+
+@media (max-width: 600px) {
+    div.page.ClassPage ul.sections > li {
+        width: 100%;
+        margin: 0 0 16px 0;
+    }
 }

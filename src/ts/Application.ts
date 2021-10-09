@@ -3,6 +3,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
 import { LoadingCurtain } from "./LoadingCurtain";
+import { ClassPage } from "./Pages/ClassPage";
 import { CoursePage } from "./Pages/CoursePage";
 import { LandingPage } from "./Pages/LandingPage";
 import { Page } from "./Pages/Page";
@@ -60,6 +61,11 @@ export class Application
                 pageFactory: (context) => new CoursePage(this.dataSource, this.pageLink.bind(this),
                     context),
                 segmentName: "course",
+            },
+            {
+                pageFactory: (context) => new ClassPage(this.dataSource, this.pageLink.bind(this),
+                    context),
+                segmentName: "class",
             },
         ], this.pageStackUpdated.bind(this));
         this.pageElement = document.body.querySelector("main") as HTMLElement;
