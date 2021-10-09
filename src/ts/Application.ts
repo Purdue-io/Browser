@@ -3,7 +3,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import { IDataSource } from "./Data/IDataSource";
 import { PurdueApiDataSource } from "./Data/PurdueApiDataSource";
 import { DomHelpers } from "./DomHelpers";
-import { LoadingCurtain } from "./LoadingCurtain";
+import { LoadingCurtain, LoadingTicket } from "./LoadingCurtain";
 import { ClassPage } from "./Pages/ClassPage";
 import { CoursePage } from "./Pages/CoursePage";
 import { LandingPage } from "./Pages/LandingPage";
@@ -22,6 +22,9 @@ export class Application
     private readonly pageElement: HTMLElement;
     private readonly breadcrumbs: Breadcrumbs;
     private readonly loadingCurtain: LoadingCurtain;
+    private pendingPageTransitions: Promise<HTMLElement>[];
+    private processingPageTransition: boolean = false;
+    private pageTransitionLoadingTicket: LoadingTicket | null = null;
 
     public static run(): Application
     {
@@ -73,35 +76,79 @@ export class Application
         let breadcrumbsListElement = document.body.querySelector("nav ul") as HTMLUListElement;
         this.breadcrumbs = new Breadcrumbs(breadcrumbsListElement, this.navigate.bind(this));
         this.loadingCurtain = new LoadingCurtain();
+        this.pendingPageTransitions = [];
+    }
+
+    private queuePageTransition(newContentPromise: Promise<HTMLElement>): void
+    {
+        this.pendingPageTransitions.push(newContentPromise);
+        this.startPendingPageTransition();
+    }
+    
+    private startPendingPageTransition(): void
+    {
+        if (this.processingPageTransition)
+        {
+            return;
+        }
+        
+        if (this.pendingPageTransitions.length > 0)
+        {
+            this.processingPageTransition = true;
+            this.pageTransitionLoadingTicket = this.loadingCurtain.setLoading();
+            let pageContainer = this.pageElement.firstElementChild;
+            if (pageContainer !== null)
+            {
+                Animator.RunAnimation(pageContainer as HTMLElement, "anim-page-out").then(() => {
+                    this.finishPendingPageTransition();
+                });
+            }
+            else
+            {
+                this.finishPendingPageTransition();
+            }
+        }
+    }
+
+    private finishPendingPageTransition(): void
+    {
+        if (!this.processingPageTransition)
+        {
+            return;
+        }
+
+        if (this.pendingPageTransitions.length > 0)
+        {
+            let latestContentPromise = 
+                this.pendingPageTransitions[this.pendingPageTransitions.length - 1];
+            this.pendingPageTransitions.length = 0;
+            DomHelpers.clearChildren(this.pageElement);
+            latestContentPromise.then((content) => {
+                // Scroll to the top for now
+                // eventually maybe we'll work to restore scroll position
+                this.pageElement.appendChild(content);
+                window.scroll(0, 0);
+                Animator.RunAnimation(content, "anim-page-in");
+                this.processingPageTransition = false;
+                if (this.pageTransitionLoadingTicket !== null)
+                {
+                    this.pageTransitionLoadingTicket.clear();
+                    this.pageTransitionLoadingTicket = null;
+                }
+
+                // Process any transitions that occurred since we started
+                this.startPendingPageTransition();
+            });
+        }
     }
 
     private pageStackUpdated(pageStack: SegmentPage[]): void
     {
-        let newPageSegment = pageStack[pageStack.length - 1];
-        let loadingTicket = this.loadingCurtain.setLoading();
-        let newContentPromise = newPageSegment.page.showAsync();
-        let pageContainer = this.pageElement.firstElementChild;
-        if (pageContainer !== null)
-        {
-            Animator.RunAnimation(pageContainer as HTMLElement, "anim-page-out").then(() => {
-                DomHelpers.clearChildren(this.pageElement);
-                newContentPromise.then((content) => {
-                    loadingTicket.clear();
-                    this.pageElement.appendChild(content);
-                    Animator.RunAnimation(content, "anim-page-in");
-                });
-            });
-        }
-        else
-        {
-            DomHelpers.clearChildren(this.pageElement);
-            newContentPromise.then((content) => {
-                loadingTicket.clear();
-                this.pageElement.appendChild(content);
-                Animator.RunAnimation(content, "anim-page-in");
-            });
-        }
         this.breadcrumbs.updateBreadcrumbs(pageStack);
+        let newPageSegment = pageStack[pageStack.length - 1];
+        
+        let newContentPromise = newPageSegment.page.showAsync();
+        this.queuePageTransition(newContentPromise);
     }
 
     private pageLink(originPage: Page, nextSegment: string, hints: PageHints): void
