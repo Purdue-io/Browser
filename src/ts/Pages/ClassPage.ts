@@ -52,12 +52,13 @@ export class ClassPage extends Page
 
     private async updateClassDetailsAsync(): Promise<void>
     {
-        let classListElement = this._content.querySelector("ul.sections");
-        if (classListElement === null)
+        let sectionListElement = this._content.querySelector("ul.sections");
+        if (sectionListElement === null)
         {
             throw new Error("Could not update section list, " + 
                 "element 'ul.sections' could not be found");
         }
+        sectionListElement.replaceChildren();
 
         let classDetails = await this.dataSource.getClassDetailsAsync(this.classId);
         let groupedSections = Utilities.getGroupedSections(classDetails.Sections);
@@ -66,53 +67,53 @@ export class ClassPage extends Page
             let listHeaderElement = document.createElement("li");
             listHeaderElement.classList.add("sectionType");
             listHeaderElement.innerText = `${type}`;
-            classListElement.appendChild(listHeaderElement);
+            sectionListElement.appendChild(listHeaderElement);
 
             for (let sectionDetails of (groupedSections.get(type) as SectionDetails[]))
             {
-                let sectionListElement = document.createElement("li");
-                sectionListElement.classList.add("section");
+                let sectionListItemElement = document.createElement("li");
+                sectionListItemElement.classList.add("section");
 
                 let crnElement = document.createElement("div");
                 crnElement.classList.add("crn");
                 crnElement.innerText = `${sectionDetails.Crn}`;
-                sectionListElement.appendChild(crnElement);
+                sectionListItemElement.appendChild(crnElement);
 
                 let instructorLabel = document.createElement("label");
                 instructorLabel.innerText = "Instructor";
-                sectionListElement.appendChild(instructorLabel);
+                sectionListItemElement.appendChild(instructorLabel);
 
                 let instructorListElement = this.getInstructorListElement(sectionDetails);
-                sectionListElement.appendChild(instructorListElement);
+                sectionListItemElement.appendChild(instructorListElement);
 
                 let meetingLabel = document.createElement("label");
                 meetingLabel.innerText = "Meeting";
-                sectionListElement.appendChild(meetingLabel);
+                sectionListItemElement.appendChild(meetingLabel);
 
                 let meetingTableElement = this.getMeetingTableElement(sectionDetails);
-                sectionListElement.appendChild(meetingTableElement);
+                sectionListItemElement.appendChild(meetingTableElement);
 
                 let enrollmentLabel = document.createElement("label");
                 enrollmentLabel.innerText = "Enrollment";
-                sectionListElement.appendChild(enrollmentLabel);
+                sectionListItemElement.appendChild(enrollmentLabel);
 
                 let capacityElement = document.createElement("div");
                 capacityElement.classList.add("capacity");
                 capacityElement.innerText = 
                     `${sectionDetails.Enrolled} / ${sectionDetails.Capacity}`;
-                sectionListElement.appendChild(capacityElement);
+                sectionListItemElement.appendChild(capacityElement);
 
                 let waitListLabel = document.createElement("label");
                 waitListLabel.innerText = "Waitlist";
-                sectionListElement.appendChild(waitListLabel);
+                sectionListItemElement.appendChild(waitListLabel);
 
                 let waitListElement = document.createElement("div");
                 waitListElement.classList.add("waitList");
                 waitListElement.innerText = 
                     `${sectionDetails.WaitListCount} / ${sectionDetails.WaitListCapacity}`;
-                sectionListElement.appendChild(waitListElement);
+                sectionListItemElement.appendChild(waitListElement);
 
-                classListElement.appendChild(sectionListElement);
+                sectionListElement.appendChild(sectionListItemElement);
             }
         }
     }

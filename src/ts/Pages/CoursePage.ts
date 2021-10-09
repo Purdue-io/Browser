@@ -59,6 +59,7 @@ export class CoursePage extends Page
         {
             throw new Error("Could not update class list, element 'ul.classes' could not be found");
         }
+        classListElement.replaceChildren();
 
         let courseDetails = await this.dataSource.getTermCourseDetailsAsync(this.termCode,
             this.courseId);
