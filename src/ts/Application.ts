@@ -28,7 +28,7 @@ export class Application
 
     public static run(): Application
     {
-        let dataSource = new PurdueApiDataSource("https://new-api.purdue.io/odata");
+        let dataSource = new PurdueApiDataSource("https://api.purdue.io/odata");
         let returnVal = new Application(dataSource);
         returnVal.start();
         return returnVal;
