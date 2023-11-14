@@ -130,10 +130,13 @@ export class CoursePage extends Page
                     let daysCol = document.createElement("td");
                     daysCol.innerText = Utilities.getDaysOfWeek(meeting.DaysOfWeek).join("\u00a0");
                     sectionRow.appendChild(daysCol);
-                    let timeCol = document.createElement("td");
-                    timeCol.innerText = Utilities.getTimeString(
-                        new Date(meeting.StartDate + "T" + meeting.StartTime));
-                    sectionRow.appendChild(timeCol);
+                    if (meeting.StartTime !== null)
+                    {
+                        let timeCol = document.createElement("td");
+                        timeCol.innerText = Utilities.getTimeString(
+                            new Date(meeting.StartDate + "T" + meeting.StartTime));
+                        sectionRow.appendChild(timeCol);
+                    }
                     tableBodyElement.appendChild(sectionRow);
                 }
 

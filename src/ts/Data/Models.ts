@@ -69,7 +69,7 @@ export interface MeetingDetails
     StartDate: string;
     EndDate: string;
     DaysOfWeek: string;
-    StartTime: string;
+    StartTime: string | null;
     Duration: string;
     RoomId: string;
     Instructors: Instructor[];
