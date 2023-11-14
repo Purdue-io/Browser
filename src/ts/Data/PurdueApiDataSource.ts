@@ -10,9 +10,17 @@ export class PurdueApiDataSource implements IDataSource
         this.odataRootUri = odataRootUri;
     }
 
-    async getTermsAsync(): Promise<Term[]>
+    async getTermsAsync(includeEmptyTerms: boolean = false): Promise<Term[]>
     {
-        let response = await fetch(`${this.odataRootUri}/Terms`);
+        let response: Response;
+        if (includeEmptyTerms)
+        {
+            response = await fetch(`${this.odataRootUri}/Terms`);
+        }
+        else
+        {
+            response = await fetch(`${this.odataRootUri}/Terms?$filter=(Classes/$count gt 0)`);
+        }
         if (!response.ok)
         {
             throw new Error(`Received error response when fetching Terms: ` + 
