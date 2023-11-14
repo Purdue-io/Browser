@@ -36,18 +36,36 @@ export class LandingPage extends Page
         let terms = await this.dataSource.getTermsAsync();
         terms.sort((a, b) => {
             // Sort undefined start dates to the bottom
-            let minDate = new Date("0001-01-01T00:00:00Z");
-            if ((a.StartDate === minDate) && (b.EndDate !== minDate))
+            if ((a.StartDate === null) && (b.StartDate !== null))
             {
                 return 1;
             }
-            else if ((b.StartDate === minDate) && (a.EndDate !== minDate))
+            else if ((b.StartDate === null) && (a.StartDate !== null))
             {
                 return -1;
             }
+            else if ((a.StartDate === null) && (b.StartDate === null))
+            {
+                let intA = parseInt(a.Code);
+                let intB = parseInt(b.Code);
+                if (intA < intB)
+                {
+                    return 1;
+                }
+                else if (intA > intB)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
 
-            let aGtB: number = (a.StartDate > b.StartDate) ? 1 : 0;
-            let bGtA: number = (a.StartDate < b.StartDate) ? 1 : 0;
+            let aStartDate = new Date(a.StartDate);
+            let bStartDate = new Date(b.StartDate);
+            let aGtB: number = (aStartDate > bStartDate) ? 1 : 0;
+            let bGtA: number = (aStartDate < bStartDate) ? 1 : 0;
             return (bGtA - aGtB);
         });
 

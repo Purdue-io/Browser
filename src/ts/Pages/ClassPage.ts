@@ -94,26 +94,6 @@ export class ClassPage extends Page
                 let meetingTableElement = this.getMeetingTableElement(sectionDetails);
                 sectionListItemElement.appendChild(meetingTableElement);
 
-                let enrollmentLabel = document.createElement("label");
-                enrollmentLabel.innerText = "Enrollment";
-                sectionListItemElement.appendChild(enrollmentLabel);
-
-                let capacityElement = document.createElement("div");
-                capacityElement.classList.add("capacity");
-                capacityElement.innerText = 
-                    `${sectionDetails.Enrolled} / ${sectionDetails.Capacity}`;
-                sectionListItemElement.appendChild(capacityElement);
-
-                let waitListLabel = document.createElement("label");
-                waitListLabel.innerText = "Waitlist";
-                sectionListItemElement.appendChild(waitListLabel);
-
-                let waitListElement = document.createElement("div");
-                waitListElement.classList.add("waitList");
-                waitListElement.innerText = 
-                    `${sectionDetails.WaitListCount} / ${sectionDetails.WaitListCapacity}`;
-                sectionListItemElement.appendChild(waitListElement);
-
                 sectionListElement.appendChild(sectionListItemElement);
             }
         }
@@ -171,9 +151,11 @@ export class ClassPage extends Page
             meetingRow.appendChild(daysCol);
 
             let timeCol = document.createElement("td");
-            let startTime = Utilities.getTimeString(new Date(meeting.StartTime));
+            let startTime = Utilities.getTimeString(
+                new Date(meeting.StartDate + "T" + meeting.StartTime));
             let endTime = Utilities.getTimeString(
-                Utilities.datePlusDuration(new Date(meeting.StartTime), meeting.Duration));
+                Utilities.datePlusDuration(
+                    new Date(meeting.StartDate + "T" + meeting.StartTime), meeting.Duration));
             timeCol.innerText = `${startTime} - ${endTime}`
             meetingRow.appendChild(timeCol);
         }

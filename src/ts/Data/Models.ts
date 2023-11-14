@@ -183,8 +183,7 @@ export class Utilities
     {
         return date.toLocaleTimeString(navigator.language, {
             hour: "numeric",
-            minute: "2-digit",
-            timeZone: "America/Indiana/Indianapolis" // HACK: Close enough.
+            minute: "2-digit"
         });
     }
 

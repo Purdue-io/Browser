@@ -124,13 +124,15 @@ export class CoursePage extends Page
                         "-";
                     sectionRow.appendChild(instructorCol);
                     let locationCol = document.createElement("td");
-                    locationCol.innerText = `${meeting.Room.Building.ShortCode}/${meeting.Room.Number}`;
+                    locationCol.innerText =
+                        `${meeting.Room.Building.ShortCode}/${meeting.Room.Number}`;
                     sectionRow.appendChild(locationCol);
                     let daysCol = document.createElement("td");
                     daysCol.innerText = Utilities.getDaysOfWeek(meeting.DaysOfWeek).join("\u00a0");
                     sectionRow.appendChild(daysCol);
                     let timeCol = document.createElement("td");
-                    timeCol.innerText = Utilities.getTimeString(new Date(meeting.StartTime));
+                    timeCol.innerText = Utilities.getTimeString(
+                        new Date(meeting.StartDate + "T" + meeting.StartTime));
                     sectionRow.appendChild(timeCol);
                     tableBodyElement.appendChild(sectionRow);
                 }
