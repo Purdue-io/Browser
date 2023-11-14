@@ -150,14 +150,17 @@ export class ClassPage extends Page
             daysCol.innerText = Utilities.getDaysOfWeek(meeting.DaysOfWeek).join("\u00a0");
             meetingRow.appendChild(daysCol);
 
-            let timeCol = document.createElement("td");
-            let startTime = Utilities.getTimeString(
-                new Date(meeting.StartDate + "T" + meeting.StartTime));
-            let endTime = Utilities.getTimeString(
-                Utilities.datePlusDuration(
-                    new Date(meeting.StartDate + "T" + meeting.StartTime), meeting.Duration));
-            timeCol.innerText = `${startTime} - ${endTime}`
-            meetingRow.appendChild(timeCol);
+            if (meeting.StartTime !== null)
+            {
+                let timeCol = document.createElement("td");
+                let startTime = Utilities.getTimeString(
+                    new Date(meeting.StartDate + "T" + meeting.StartTime));
+                let endTime = Utilities.getTimeString(
+                    Utilities.datePlusDuration(
+                        new Date(meeting.StartDate + "T" + meeting.StartTime), meeting.Duration));
+                timeCol.innerText = `${startTime} - ${endTime}`
+                meetingRow.appendChild(timeCol);
+            }
         }
 
         return meetingTableElement;
