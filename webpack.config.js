@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 var config = {
     entry: './src/index.ts',
@@ -18,7 +19,12 @@ var config = {
     output: {
         filename: 'index.js',
         path: path.resolve(__dirname, 'dist'),
-    }
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env.API_URL': JSON.stringify(process.env.API_URL || 'https://api.purdue.io/odata')
+        })
+    ]
 };
 
 module.exports = (env, argv) => {

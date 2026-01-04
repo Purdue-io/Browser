@@ -1,0 +1,46 @@
+name: Docker PR Verification
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'nginx.conf'
+      - '.dockerignore'
+      - 'src/**'
+      - 'package*.json'
+      - 'webpack.config.js'
+      - 'tsconfig.json'
+
+jobs:
+  verify:
+    name: Verify Docker Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: purdueio-browser:pr-${{ github.event.pull_request.number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test image runs
+        run: |
+          docker run -d --name test-container -p 8080:80 purdueio-browser:pr-${{ github.event.pull_request.number }}
+          sleep 5
+          curl -f http://localhost:8080 || exit 1
+          docker stop test-container
