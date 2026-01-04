@@ -9,26 +9,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
       with:
-        node-version: 14.x
+        node-version: 18.x
+        cache: 'npm'
 
-    - name: Restore Packages
-      run: npm install
+    - name: Install dependencies
+      run: npm ci
 
-    - name: Build and Publish
+    - name: Build
       run: npm run publish
-      
+
     - name: Test
       run: npm run test
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: Browser
         path: dist

@@ -33,6 +33,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+          load: true
           tags: purdueio-browser:pr-${{ github.event.pull_request.number }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
