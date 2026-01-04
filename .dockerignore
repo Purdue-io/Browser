@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Git
+.git
+.gitignore
+.github
+
+# Build outputs
+dist/index.js
+dist/index.js.map
+
+# Development
+.vscode
+.idea
+
+# Testing
+coverage
+test
+
+# Documentation
+README.md
+LICENSE
+
+# Misc
+*.md
+.DS_Store
