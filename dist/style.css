@@ -226,7 +226,7 @@ div.page.LandingPage ul.terms {
 
     div.page.LandingPage section.welcome {
         min-width: 240px;
-        flex-shrink: 0.2;
+        flex-shrink: 0.8;
     }
 
     div.page.LandingPage ul.terms > li > a {
